@@ -1,0 +1,18 @@
+version = "" # Bot version
+env = "" # Current enviorment (dev, prod)
+prefix = "" # Default command prefix
+devToken = "" # Development bot token
+token = "" # Production bot token
+eWebhook = "" # Webhook url for error handeling
+developer = "" # Developer user id
+[db]
+    host = "" # MongoDB host
+    port = 27017 # MongoDB port
+    name = "" # MongoDB database name
+[api]
+    url = "" # kurozeropb.info api url
+    token = "" # Api auth token
+[proxy]
+    enabled = false # Enable or disable proxy usage
+    host = "" # Proxy host
+    port = 8080 # Proxy port

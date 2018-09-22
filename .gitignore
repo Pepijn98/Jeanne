@@ -21,3 +21,19 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Gradle files
+.gradle
+!gradle-wrapper.jar
+
+# Build files
+build/
+out/
+command.txt
+command-ideas/
+
+# JetBrains files
+.idea/
+
+# Config files
+config.toml
