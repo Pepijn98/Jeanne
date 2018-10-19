@@ -56,7 +56,7 @@ object Sophie {
         config = ConfigManager.read()
         val token = if (config.env.startsWith("dev")) config.devToken else config.token
         httpClient = if (config.proxy.enabled) OkHttpClient.Builder().proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.proxy.host, config.proxy.port))).build() else OkHttpClient.Builder().build()
-        embedColor = Color.decode("0x6d7293")
+        embedColor = Color.decode("0xBA2F6B")
         Utils.catchAll("Exception occured in main", null) {
             DatabaseManager.initialize(config)
             Registry().loadCommands()
