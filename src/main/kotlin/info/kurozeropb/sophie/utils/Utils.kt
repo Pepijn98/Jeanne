@@ -56,6 +56,7 @@ class Utils(private val e: MessageReceivedEvent) {
 
         fun stripEveryoneHere(msg: Message): Message = build(stripEveryoneHere(msg.contentRaw))
 
+        @Suppress("unused")
         fun stripFormatting(text: String): String = text.replace("@", "\\@")
                 .replace("~~", "\\~\\~")
                 .replace("*", "\\*")
@@ -109,6 +110,7 @@ class Utils(private val e: MessageReceivedEvent) {
             return actions.map { it.await() }
         }
 
+        @Suppress("MemberVisibilityCanBePrivate")
         suspend fun <T> RestAction<T>.await(): T {
             return submit().await()
         }

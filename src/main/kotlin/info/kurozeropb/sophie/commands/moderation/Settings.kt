@@ -11,6 +11,7 @@ import org.litote.kmongo.SetTo
 import org.litote.kmongo.eq
 import org.litote.kmongo.set
 
+@Suppress("unused")
 class Settings : Command(
         name = "settings",
         category = "moderation",
