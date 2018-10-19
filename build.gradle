@@ -1,5 +1,5 @@
 group 'info.kurozeropb'
-version '0.2.0'
+version '0.3.0'
 
 buildscript {
     ext {
@@ -25,7 +25,7 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'kotlin'
 
-mainClassName = "${group}.prinzeugen.Prinz"
+mainClassName = "${group}.sophie.Sophie"
 sourceCompatibility = 1.8
 defaultTasks 'run'
 
@@ -79,7 +79,7 @@ distributions {
 }
 
 shadowJar {
-    baseName = 'prinzeugen'
+    baseName = 'sophie'
     classifier = null
     version = version
     destinationDir = file('build/libs')
