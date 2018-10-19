@@ -42,6 +42,10 @@ class Settings : Command(
                     }
 
                     var newPrefix = prefixArgs.joinToString(" ").replace("\\$$".toRegex(), "")
+
+                    if (newPrefix == "reset" || newPrefix == "default")
+                        newPrefix = Sophie.config.prefix
+
                     if (newPrefix.matches("^<@!?${e.jda.selfUser.id}>$".toRegex())) {
                         newPrefix = "%mention%"
                     } else if (newPrefix.length > 32) {
