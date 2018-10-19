@@ -3,7 +3,7 @@ version '0.3.0'
 
 buildscript {
     ext {
-        kotlin_version = '1.2.70'
+        kotlin_version = '1.2.71'
         shadow_version = '2.0.4'
         kotlinx_version = '0.22.5'
         logback_version = '1.2.3'
