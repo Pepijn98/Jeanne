@@ -14,11 +14,9 @@ class Aesthetic : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in ping command", e.channel) {
-            if (args.isEmpty()) {
-                e.reply("Insufficient argument count")
-                return
-            }
+        Utils.catchAll("Exception occured in aesthetic command", e.channel) {
+            if (args.isEmpty())
+                return e.reply("Insufficient argument count")
 
             var message = args.joinToString(" ")
             message = message.replace(Regex("[a-zA-Z0-9!?.'\";:\\]\\[}{)(@#\$%^&*\\-_=+`~><]")) { c -> c.value[0].plus(0xFEE0).toString() }

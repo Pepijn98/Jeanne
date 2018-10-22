@@ -12,6 +12,7 @@ developer = "" # Developer user id
 [api]
     url = "" # kurozeropb.info api url
     token = "" # Api auth token
+    imdbKey = "" # Api key from omdb
 [proxy]
     enabled = false # Enable or disable proxy usage
     host = "" # Proxy host

@@ -35,7 +35,7 @@ class `8ball` : Command(
     )
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in ping command", e.channel) {
+        Utils.catchAll("Exception occured in 8ball command", e.channel) {
             if (args.isEmpty()) {
                 e.reply("Insufficient argument count")
                 return

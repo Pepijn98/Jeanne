@@ -1,8 +1,6 @@
 package info.kurozeropb.sophie.commands.nsfw
 
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import info.kurozeropb.sophie.ONsfwData
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
@@ -11,31 +9,19 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.*
 import java.io.IOException
 
-class Ass : Command(
-        name = "ass",
-        aliases = listOf("butt"),
+class Boobs : Command(
+        name = "boobs",
+        aliases = listOf("tits"),
         category = "nsfw",
-        description = "Sends a random ass pic",
+        description = "Sends a random boobs pic",
         botPermissions = listOf(
                 Permission.MESSAGE_WRITE,
                 Permission.MESSAGE_ATTACH_FILES
         )
 ) {
 
-    data class AssData(
-            val model: String?,
-            val preview: String,
-            val id: Int,
-            val rank: Int,
-            val author: String?
-    ) {
-        class Deserializer : ResponseDeserializable<ArrayList<AssData>> {
-            override fun deserialize(content: String): ArrayList<AssData>? = Gson().fromJson(content, object:TypeToken<ArrayList<AssData>>(){}.type)
-        }
-    }
-
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in ass command", e.channel) {
+        Utils.catchAll("Exception occured in boobs command", e.channel) {
             if (e.textChannel.isNSFW.not()) {
                 e.reply("This command can only be used in NSFW channels")
                 return
@@ -47,7 +33,7 @@ class Ass : Command(
             headers.putAll(mapOf("Accept" to "application/json"))
             val request = Request.Builder()
                     .headers(Headers.of(headers))
-                    .url("http://api.obutts.ru/butts/0/1/random")
+                    .url("http://api.oboobs.ru/boobs/0/1/random")
                     .build()
 
             Sophie.httpClient.newCall(request).enqueue(object : Callback {
@@ -58,19 +44,19 @@ class Ass : Command(
                 override fun onResponse(call: Call, response: Response) {
                     val respstring = response.body()?.string()
                     if (response.isSuccessful && respstring != null) {
-                        val ass = AssData.Deserializer().deserialize(respstring)
-                        if (ass != null && ass.isNotEmpty()) {
+                        val boobs = ONsfwData.Deserializer().deserialize(respstring)
+                        if (boobs != null && boobs.isNotEmpty()) {
                             headers.replace("Accept", "application/json", "image/*")
                             val newRequest = Request.Builder()
                                     .headers(Headers.of(headers))
-                                    .url("http://media.obutts.ru/${ass[0].preview.replace("butts_preview", "butts")}")
+                                    .url("http://media.oboobs.ru/${boobs[0].preview.replace("boobs_preview", "boobs")}")
                                     .build()
 
                             val resp = Sophie.httpClient.newCall(newRequest).execute()
                             if (resp.isSuccessful) {
                                 val body = resp.body()
                                 if (body != null)
-                                    e.channel.sendFile(body.byteStream(), "obutt-${ass[0].id}.${body.contentType().toString().replace("image/", "")}").queue()
+                                    e.channel.sendFile(body.byteStream(), "obutt-${boobs[0].id}.${body.contentType().toString().replace("image/", "")}").queue()
                                 else
                                     e.reply("Something went wrong while trying to fetch the image")
                             } else {

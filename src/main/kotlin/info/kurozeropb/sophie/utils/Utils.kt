@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.experimental.future.await
 import info.kurozeropb.sophie.Sophie
 import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.core.entities.Member
 import net.dv8tion.jda.core.entities.MessageChannel
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
@@ -17,6 +18,7 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
 import net.dv8tion.jda.webhook.WebhookClientBuilder
 import net.dv8tion.jda.webhook.WebhookMessageBuilder
 import java.awt.Color
+import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
 
@@ -44,6 +46,13 @@ class Utils(private val e: MessageReceivedEvent) {
     }
 
     companion object {
+        val userMentionPattern = Regex("<@!?(\\d{17,20})>")
+        val channelMentionPattern = Regex("<#(\\d{17,20})>")
+        val roleMentionPattern = Regex("<@&\\d{17,20}>")
+        val emotePattern = Regex("<:.+?:(\\d{17,20})>")
+        val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
+        val nullToNull = null to null
+
         fun edit(msg: Message, newContent: String) {
             if (!msg.isFromType(ChannelType.TEXT) || msg.textChannel.canTalk())
                 msg.editMessage(newContent).queue()
@@ -150,5 +159,34 @@ class Utils(private val e: MessageReceivedEvent) {
         fun embedColor(e: GuildBanEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
         fun embedColor(e: GuildMemberNickChangeEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
+
+        fun convertMember(str: String, e: MessageReceivedEvent): Member? {
+            if (str.isEmpty())
+                return null
+
+            val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
+            val member = try {
+                e.guild.getMemberById(id)
+            } catch (e: NumberFormatException) {
+                null
+            }
+            if (member != null)
+                return member
+
+            val (username, discrim) = convertUsernameDiscrim(str)
+            return if (discrim != null)
+                e.guild.members.find { it.user.name == username && it.user.discriminator == discrim }
+            else
+                e.guild.members.find { it.user.name == str }
+        }
+
+        fun convertUsernameDiscrim(str: String): Pair<String?, String?> {
+            return userDiscrimPattern.find(str).let {
+                if (it == null)
+                    nullToNull
+                else
+                    it.groups[1]?.value to it.groups[2]?.value
+            }
+        }
     }
 }
