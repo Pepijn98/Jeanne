@@ -10,13 +10,10 @@ class Kick : Command(
         category = "moderation",
         allowPrivate = false,
         description = "Kick a guild member",
-        userPermissions = listOf(
-                Permission.KICK_MEMBERS
-        ),
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.KICK_MEMBERS
-        )
+        usage = "<member: mention> [reason: string]",
+        cooldown = 0,
+        userPermissions = listOf(Permission.KICK_MEMBERS),
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.KICK_MEMBERS)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {

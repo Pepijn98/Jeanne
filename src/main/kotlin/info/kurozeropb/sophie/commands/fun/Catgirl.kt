@@ -16,6 +16,7 @@ class Catgirl : Command(
         aliases = listOf("catgirls", "neko", "nekos"),
         category = "fun",
         description = "Sends a cute catgirl from https://nekos.moe",
+        usage = "[\"nsfw\"]",
         cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {

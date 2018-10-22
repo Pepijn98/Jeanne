@@ -10,13 +10,10 @@ class Ban : Command(
         category = "moderation",
         allowPrivate = false,
         description = "Ban a guild member",
-        userPermissions = listOf(
-                Permission.BAN_MEMBERS
-        ),
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.BAN_MEMBERS
-        )
+        usage = "<member: mention> [days: number] [reason: string]",
+        cooldown = 0,
+        userPermissions = listOf(Permission.BAN_MEMBERS),
+        botPermissions = listOf( Permission.MESSAGE_WRITE, Permission.BAN_MEMBERS)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {

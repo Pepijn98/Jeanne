@@ -12,8 +12,9 @@ import java.lang.StringBuilder
 class Help : Command(
         name = "help",
         category = "info",
-        cooldown = 0,
+        cooldown = 2,
         description = "Shows this help message",
+        usage = "[<\"cmd/command\"|\"ctg/category\"> <command_name|category_name: string>]",
         subCommands = listOf("command", "cmd", "category", "ctg"),
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
@@ -21,12 +22,10 @@ class Help : Command(
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in help command", e.channel) {
             var prefix = DatabaseManager.guildPrefixes[e.guild.id]
-            if (prefix == null) {
+            if (prefix == null)
                 prefix = Sophie.config.prefix
-            }
-            if (prefix == "%mention%") {
+            if (prefix == "%mention%")
                 prefix = e.jda.selfUser.asMention
-            }
 
             when (args.size) {
                 0 -> {
@@ -77,15 +76,11 @@ class Help : Command(
                             val cmdName = args.subList(1, args.size).joinToString(" ")
                             val command = Registry.getCommandByName(cmdName)
                             if (command != null) {
-                                if (command.isHidden && e.author.id != Sophie.config.developer) {
-                                    e.reply("This command is hidden and can't be shown by any help command")
-                                    return
-                                }
+                                if (command.isHidden && e.author.id != Sophie.config.developer)
+                                    return e.reply("This command is hidden and can't be shown by any help command")
 
-                                if (command.isDeveloperOnly && e.author.id != Sophie.config.developer) {
-                                    e.reply("This command is developer only and can only be seen by my developer")
-                                    return
-                                }
+                                if (command.isDeveloperOnly && e.author.id != Sophie.config.developer)
+                                    return e.reply("This command is developer only and can only be seen by my developer")
 
                                 val sb = StringBuilder()
                                 sb.append("```md\n")
@@ -93,10 +88,14 @@ class Help : Command(
                                 sb.append("> ${command.description}\n\n")
                                 sb.append("- Aliases           ->   ${command.aliases.joinToString(", ")}\n")
                                 sb.append("- Sub Commands      ->   ${command.subCommands.joinToString(", ")}\n")
+                                if (command.usage != null)
+                                    sb.append("- Usage             ->   $prefix${command.name} ${command.usage}\n")
                                 sb.append("- Allow Private     ->   ${if (command.allowPrivate) "Yes" else "No"}\n")
                                 sb.append("- Developer Only    ->   ${if (command.isDeveloperOnly) "Yes" else "No"}\n")
                                 sb.append("- User permissions  ->   ${command.userPermissions.joinToString(", ")}\n")
-                                sb.append("- Bot permissions   ->   ${command.botPermissions.joinToString(", ")}\n")
+                                sb.append("- Bot permissions   ->   ${command.botPermissions.joinToString(", ")}\n\n")
+                                sb.append("<> = required\n")
+                                sb.append("[] = optional\n")
                                 sb.append("```")
                                 e.reply(sb.toString())
                             } else {

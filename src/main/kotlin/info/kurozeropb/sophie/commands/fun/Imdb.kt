@@ -13,6 +13,8 @@ class Imdb : Command(
         name = "imdb",
         category = "fun",
         description = "Search for a movie on imdb",
+        usage = "<movie|serie: string>",
+        cooldown = 20,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {
 

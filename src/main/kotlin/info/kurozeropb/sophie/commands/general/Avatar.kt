@@ -11,6 +11,7 @@ class Avatar : Command(
         aliases = listOf("ava", "pfp", "avi"),
         category = "general",
         description = "Get your or someone else's avatar",
+        usage = "[username: mention|string]",
         allowPrivate = false,
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {

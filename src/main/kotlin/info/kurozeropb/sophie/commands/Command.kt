@@ -17,6 +17,7 @@ abstract class Command(
         val name: String,
         val category: String,
         val description: String,
+        val usage: String? = null,
         val aliases: List<String> = listOf(),
         val subCommands: List<String> = listOf(),
         val cooldown: Long = 5,

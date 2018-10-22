@@ -16,6 +16,7 @@ class Pokemon : Command(
         category = "fun",
         cooldown = 20,
         description = "Search for a pokemon by name",
+        usage = "<pokemon_name: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 

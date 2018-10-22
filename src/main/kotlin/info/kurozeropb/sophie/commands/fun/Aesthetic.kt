@@ -10,6 +10,7 @@ class Aesthetic : Command(
         aliases = listOf("aes"),
         category = "fun",
         description = "Convert text to aesthetic text",
+        usage = "<text: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 

@@ -10,17 +10,13 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.concurrent.TimeUnit
 
-const val ZERO_WIDTH_SPACE = "\u200E"
-
 class Guild : Command(
         name = "guildinfo",
         aliases = listOf("serverinfo", "guild", "server"),
         category = "info",
         description = "Get info about the guild",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_EMBED_LINKS
-        )
+        allowPrivate = false,
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {
 
     private val formatter = DateTimeFormatterBuilder()
@@ -48,7 +44,7 @@ class Guild : Command(
                         **${e.guild.categories.size}** Categories
                         **AFK:** #${e.guild.afkChannel.name}
                         **AFK Timeout:** ${TimeUnit.SECONDS.toMinutes(e.guild.afkTimeout.seconds.toLong()).toInt()} Minutes
-                        $ZERO_WIDTH_SPACE
+                        ${Utils.ZERO_WIDTH_SPACE}
                     """.trimIndent(), true)
                     .addField("Defaults", """
                         **Channel:** ${e.guild.defaultChannel?.asMention ?: "None"}

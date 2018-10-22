@@ -12,23 +12,20 @@ class About : Command(
         name = "about",
         category = "info",
         description = "Shows info about me",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_EMBED_LINKS
-        )
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in about command", e.channel) {
-            val me = e.jda.users.find { it.id == Sophie.config.developer }
+            val dev = e.jda.users.find { it.id == Sophie.config.developer }
             e.reply(EmbedBuilder()
                     .setTitle("${e.jda.selfUser.name} v${Sophie.config.version}")
-                    .addField("Developer", me?.asMention, false)
+                    .setThumbnail(e.jda.selfUser.effectiveAvatarUrl)
+                    .addField("Developer", dev?.asMention, false)
                     .addField("Language", "Kotlin", true)
                     .addField("Library", "JDA ${JDAInfo.VERSION}", true)
                     .addField("Website", "https://sophiebot.info", true)
                     .addField("Support Server", "https://discord.gg/p895czC", true)
-                    .setThumbnail(e.jda.selfUser.effectiveAvatarUrl)
             )
         }
     }

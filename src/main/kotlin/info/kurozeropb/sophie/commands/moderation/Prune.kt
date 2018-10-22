@@ -13,6 +13,8 @@ class Prune : Command(
         category = "moderation",
         allowPrivate = false,
         description = "Prunes the given number of messages, defaults to 50 messages",
+        usage = "[messages_to_delete: number]",
+        cooldown = 2,
         userPermissions = listOf(Permission.MESSAGE_MANAGE),
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE)
 ) {

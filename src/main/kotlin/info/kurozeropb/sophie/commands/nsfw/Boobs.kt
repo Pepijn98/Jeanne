@@ -14,10 +14,8 @@ class Boobs : Command(
         aliases = listOf("tits"),
         category = "nsfw",
         description = "Sends a random boobs pic",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_ATTACH_FILES
-        )
+        cooldown = 10,
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {

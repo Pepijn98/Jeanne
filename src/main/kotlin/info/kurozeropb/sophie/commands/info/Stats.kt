@@ -13,6 +13,7 @@ class Stats : Command(
         name = "stats",
         category = "info",
         description = "Shows stats about Sophie",
+        cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 

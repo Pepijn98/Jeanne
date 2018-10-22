@@ -14,10 +14,8 @@ class Channel : Command(
         aliases = listOf("channel"),
         category = "info",
         description = "Get info about the current channel",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_EMBED_LINKS
-        )
+        allowPrivate = false,
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {
 
     private val formatter = DateTimeFormatterBuilder()
@@ -30,8 +28,7 @@ class Channel : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in channel command", e.channel) {
-            val channel = e.channel as TextChannel
-
+            val channel = e.textChannel
             e.reply(EmbedBuilder()
                     .setTitle("Channel info of " + channel.name)
                     .setThumbnail(e.guild.iconUrl ?: "https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png")

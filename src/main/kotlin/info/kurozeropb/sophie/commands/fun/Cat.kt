@@ -13,6 +13,7 @@ class Cat : Command(
         name = "cat",
         category = "fun",
         description = "Sends random cat image from http://random.cat",
+        cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)
 ) {
 

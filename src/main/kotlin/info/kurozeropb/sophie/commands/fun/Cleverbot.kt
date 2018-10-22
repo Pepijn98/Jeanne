@@ -15,10 +15,11 @@ class Cleverbot : Command(
         aliases = listOf("cb"),
         category = "fun",
         description = "Chat with the bot",
+        usage = "<question: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 
-    private var questionCache: ArrayList<QuestionCache> = arrayListOf()
+    private val questionCache: ArrayList<QuestionCache> = arrayListOf()
     private fun spamCheck(userId: String, question: String): Boolean {
         val value = questionCache.find { it.id == userId }
 
@@ -40,11 +41,12 @@ class Cleverbot : Command(
 
             val question = args.joinToString(" ")
             val user = e.author
-
             val spamCheck = spamCheck(user.id, question)
+
             if (spamCheck) {
-                val owner = e.jda.getUserById(Sophie.config.developer)
                 e.channel.sendTyping().queue()
+
+                val owner = e.jda.getUserById(Sophie.config.developer)
                 val headers = Sophie.defaultHeaders
                 headers.putAll(mapOf("Accept" to "application/json"))
                 val request = Request.Builder()

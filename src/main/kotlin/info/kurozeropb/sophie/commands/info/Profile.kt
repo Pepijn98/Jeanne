@@ -18,7 +18,9 @@ class Profile : Command(
         name = "profile",
         category = "info",
         description = "View your profile card",
+        usage = "[\"large\"|\"small\"|<\"update\"] [\"bg/background\"|\"about\"] [new_value: string]>",
         aliases = listOf("me", "level", "card"),
+        subCommands = listOf("update", "large", "small"),
         cooldown = 30,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)
 ) {
@@ -28,25 +30,19 @@ class Profile : Command(
             var user = DatabaseManager.users.findOne(User::id eq e.author.id)
 
             if (args.isNotEmpty() && args[0] == "update") {
-                if (args.size <= 2) {
-                    e.reply("Please specify what to update and the value to update.\n" +
-                            "For more help about this command please visit https://sophiebot.info/settings")
-                    return
-                }
+                if (args.size <= 2)
+                    return e.reply("Please specify what to update and the value to update.\nFor more help about this command please visit https://sophiebot.info/settings")
 
                 when (args[1]) {
                     "bg", "background" -> {
                         val regex = """^(http)?s?:?(//[^"']*\.(?:png|jpg|jpeg|gif|svg))$""".toRegex()
 
-                        if (!args[2].matches(regex)) {
-                            e.reply("I don't think that's a valid image url, if it is please talk to my owner about it")
-                            return
-                        }
+                        if (!args[2].matches(regex))
+                            return e.reply("I don't think that's a valid image url, if it is please talk to my owner about it")
 
                         if (user == null) {
                             DatabaseManager.users.insertOne(User(e.author.id, background = args[2]))
-                            e.reply("Successfully updated your profile background")
-                            return
+                            return e.reply("Successfully updated your profile background")
                         }
 
                         DatabaseManager.users.updateOne(User::id eq e.author.id, set(User::background, args[2]))
@@ -57,8 +53,7 @@ class Profile : Command(
 
                         if (user == null) {
                             DatabaseManager.users.insertOne(User(e.author.id, about = message))
-                            e.reply("Successfully updated your about description")
-                            return
+                            return e.reply("Successfully updated your about description")
                         }
 
                         DatabaseManager.users.updateOne(User::id eq e.author.id, set(User::about, message))
@@ -74,10 +69,9 @@ class Profile : Command(
             }
 
             val size = if (args.isNotEmpty()) args[0].toLowerCase() else "small"
-            if (size != "large" && size != "small") {
-                e.reply("Invalid size, only sizes 'large' and 'small' are allowed.")
-                return
-            }
+            if (size != "large" && size != "small")
+                return e.reply("Invalid size, only sizes 'large' and 'small' are allowed.")
+
             val json = """
                 {
                     "username": "${e.author.name}",

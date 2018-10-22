@@ -22,6 +22,7 @@ import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
 
+@Suppress("MemberVisibilityCanBePrivate")
 class Utils(private val e: MessageReceivedEvent) {
 
     fun embedColor(): Color = e.guild.selfMember.color ?: Sophie.embedColor
@@ -46,6 +47,7 @@ class Utils(private val e: MessageReceivedEvent) {
     }
 
     companion object {
+        const val ZERO_WIDTH_SPACE = "\u200E"
         val userMentionPattern = Regex("<@!?(\\d{17,20})>")
         val channelMentionPattern = Regex("<#(\\d{17,20})>")
         val roleMentionPattern = Regex("<@&\\d{17,20}>")
@@ -65,7 +67,6 @@ class Utils(private val e: MessageReceivedEvent) {
 
         fun stripEveryoneHere(msg: Message): Message = build(stripEveryoneHere(msg.contentRaw))
 
-        @Suppress("unused")
         fun stripFormatting(text: String): String = text.replace("@", "\\@")
                 .replace("~~", "\\~\\~")
                 .replace("*", "\\*")
@@ -119,7 +120,6 @@ class Utils(private val e: MessageReceivedEvent) {
             return actions.map { it.await() }
         }
 
-        @Suppress("MemberVisibilityCanBePrivate")
         suspend fun <T> RestAction<T>.await(): T {
             return submit().await()
         }

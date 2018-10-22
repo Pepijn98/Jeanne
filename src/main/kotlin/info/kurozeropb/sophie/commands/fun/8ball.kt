@@ -6,10 +6,11 @@ import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import java.util.*
 
-class `8ball` : Command(
+class EightBall : Command(
         name = "8ball",
         category = "fun",
         description = "Ask the magic 8 ball",
+        usage = "<question: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 
@@ -36,10 +37,8 @@ class `8ball` : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in 8ball command", e.channel) {
-            if (args.isEmpty()) {
-                e.reply("Insufficient argument count")
-                return
-            }
+            if (args.isEmpty())
+                return e.reply("Insufficient argument count")
 
             e.reply(answers.random(rand))
         }

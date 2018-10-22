@@ -14,10 +14,8 @@ class Butts : Command(
         aliases = listOf("ass", "butt"),
         category = "nsfw",
         description = "Sends a random butt pic",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_ATTACH_FILES
-        )
+        cooldown = 10,
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {

@@ -16,8 +16,8 @@ class Settings : Command(
         name = "settings",
         category = "moderation",
         description = "Setup the settings for the current guild",
-        cooldown = 20,
         allowPrivate = false,
+        usage = "(Full usage at https://sophiebot.info/settings)",
         userPermissions = listOf(Permission.ADMINISTRATOR),
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {

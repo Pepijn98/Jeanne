@@ -14,10 +14,9 @@ class Manga : Command(
         name = "manga",
         category = "fun",
         description = "Find information about a manga",
-        botPermissions = listOf(
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_EMBED_LINKS
-        )
+        usage = "<manga_name: string>",
+        cooldown = 10,
+        botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
@@ -35,7 +34,7 @@ class Manga : Command(
 
             Sophie.httpClient.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, exception: IOException) {
-                    throw IOException(exception)
+                    throw exception
                 }
 
                 override fun onResponse(call: Call, response: Response) {
