@@ -37,9 +37,9 @@ class Channel : Command(
                     .addField("Position", channel.position.toString(), true)
                     .addField("Extra", """
                         **NSFW:** ${if (channel.isNSFW) "yes" else "no"}
-                        **Category:** ${channel.parent.name}
+                        **Category:** ${channel.parent?.name ?: "-"}
                     """.trimIndent(), true)
-                    .addField("Topic", channel.topic, false)
+                    .addField("Topic", channel.topic ?: "-", false)
                     .setFooter("ID: ${channel.id} | Created on: ${channel.creationTime.format(formatter)}", null)
             )
         }

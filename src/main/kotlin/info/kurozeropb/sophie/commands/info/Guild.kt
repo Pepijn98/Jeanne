@@ -42,12 +42,12 @@ class Guild : Command(
                         **${e.guild.textChannels.size}** Text
                         **${e.guild.voiceChannels.size}** Voice
                         **${e.guild.categories.size}** Categories
-                        **AFK:** #${e.guild.afkChannel.name}
+                        **AFK:** ${if (e.guild.afkChannel != null) "#${e.guild.afkChannel.name}" else "-"}
                         **AFK Timeout:** ${TimeUnit.SECONDS.toMinutes(e.guild.afkTimeout.seconds.toLong()).toInt()} Minutes
                         ${Utils.ZERO_WIDTH_SPACE}
                     """.trimIndent(), true)
                     .addField("Defaults", """
-                        **Channel:** ${e.guild.defaultChannel?.asMention ?: "None"}
+                        **Channel:** ${e.guild.defaultChannel?.asMention ?: "-"}
                         **Notifications:** ${e.guild.defaultNotificationLevel.name.toLowerCase().replace("_", " ").capitalize()}
                     """.trimIndent(), true)
                     .addField("Others", """
