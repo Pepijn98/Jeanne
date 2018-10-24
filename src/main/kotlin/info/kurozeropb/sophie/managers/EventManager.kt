@@ -16,8 +16,9 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.set
 import kotlin.math.floor
 import kotlin.math.sqrt
-import kotlinx.coroutines.experimental.async
 import info.kurozeropb.sophie.Cooldown
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
@@ -164,7 +165,7 @@ class EventManager : ListenerAdapter() {
                 }
             }
 
-            async {
+            GlobalScope.async {
                 command.execute(args, e)
             }
         }

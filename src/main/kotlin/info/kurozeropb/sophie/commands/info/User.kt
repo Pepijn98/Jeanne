@@ -13,6 +13,7 @@ class User : Command(
         aliases = listOf("memberinfo", "member", "user"),
         category = "info",
         description = "Get info about a guild member",
+        usage = "[username: mention|string]",
         allowPrivate = false,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {

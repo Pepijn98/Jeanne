@@ -5,7 +5,7 @@ import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
-import kotlinx.coroutines.experimental.future.await
+import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.Member

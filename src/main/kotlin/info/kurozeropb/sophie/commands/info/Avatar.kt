@@ -1,4 +1,4 @@
-package info.kurozeropb.sophie.commands.general
+package info.kurozeropb.sophie.commands.info
 
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 class Avatar : Command(
         name = "avatar",
         aliases = listOf("ava", "pfp", "avi"),
-        category = "general",
+        category = "info",
         description = "Get your or someone else's avatar",
         usage = "[username: mention|string]",
         allowPrivate = false,

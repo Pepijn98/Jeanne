@@ -1,11 +1,11 @@
 group 'info.kurozeropb'
-version '0.3.1-beta'
+version '0.3.2-beta'
 
 buildscript {
     ext {
-        kotlin_version = '1.2.71'
-        shadow_version = '2.0.4'
-        kotlinx_version = '0.22.5'
+        kotlin_version = '1.3.0-rc-190'
+        shadow_version = '4.0.1'
+        kotlinx_version = '1.0.0-RC1'
         logback_version = '1.2.3'
     }
 
@@ -24,13 +24,11 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'kotlin'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = "${group}.sophie.Sophie"
 sourceCompatibility = 1.8
 defaultTasks 'run'
-
-// I don't like warnings in my console so we put this below mainClassName
-apply plugin: 'com.github.johnrengelman.shadow'
 
 repositories {
     mavenCentral()
@@ -40,6 +38,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinx_version"
     compile 'net.dv8tion:JDA:3.8.1_439'
@@ -50,15 +49,10 @@ dependencies {
     compile "ch.qos.logback:logback-core:$logback_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
     compile 'com.github.kittinunf.fuel:fuel-gson:1.12.1'
+    compile 'com.github.markozajc:akiwrapper:1.3.4.6'
     // jsoup for future use
     // compile 'org.jsoup:jsoup:1.11.3'
     testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
-kotlin {
-    experimental {
-        coroutines 'enable'
-    }
 }
 
 distributions {
@@ -67,6 +61,7 @@ distributions {
             from(file('config.example.toml')) {
                 rename 'config.example.toml', 'config.toml'
                 into 'lib'
+                into 'bin'
             }
         }
     }
@@ -75,6 +70,7 @@ distributions {
             from(file('config.example.toml')) {
                 rename 'config.example.toml', 'config.toml'
                 into 'lib'
+                into 'bin'
             }
         }
     }

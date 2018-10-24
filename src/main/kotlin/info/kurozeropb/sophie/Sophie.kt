@@ -12,7 +12,8 @@ import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
-import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -75,7 +76,7 @@ object Sophie {
                     .build()
         }
 
-        async {
+        GlobalScope.async {
             Utils.setInterval(600000) {
                 val game = games[Math.floor((Math.random() * games.size)).toInt()]
                 val name = game.name
