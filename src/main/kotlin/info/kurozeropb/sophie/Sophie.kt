@@ -26,7 +26,7 @@ object Sophie {
             "net.dv8tion.jda" to Level.INFO,
             "org.reflections.Reflections" to Level.INFO
     )
-    private val games = arrayListOf(
+    val games = arrayListOf(
             PlayingGame("with Senpai", Game.GameType.DEFAULT),
             PlayingGame("with my master", Game.GameType.DEFAULT),
             PlayingGame("anime", Game.GameType.WATCHING),
@@ -70,7 +70,7 @@ object Sophie {
             shardManager = DefaultShardManagerBuilder()
                     .setShardsTotal(-1)
                     .setToken(token)
-                    .setGame(Game.playing("Jeanne d'Arc will be renamed to Sophie Twilight after the rewrite! Yaay!!"))
+                    .setGame(Game.playing("https://sophiebot.info/"))
                     .setBulkDeleteSplittingEnabled(false)
                     .addEventListeners(EventManager())
                     .build()

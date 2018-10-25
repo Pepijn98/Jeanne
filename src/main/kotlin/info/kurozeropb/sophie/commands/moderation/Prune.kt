@@ -22,16 +22,18 @@ class Prune : Command(
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in prune command", e.channel) {
             val history = e.textChannel.history
-            var messagesToDelete = 51
+            var messagesToDelete = 50
             if (args.isNotEmpty())
                 messagesToDelete = try {
-                    args.joinToString("").toInt() + 1
+                    args.joinToString("").toInt()
                 } catch (exception: NumberFormatException) {
                     return e.reply("Argument needs to be a number")
                 }
 
             if (messagesToDelete <= 1)
                 return e.reply("You need to delete 1 or more messages to use this command.")
+            else if (messagesToDelete > 100)
+                return e.reply("You cannot delete more than 100 messages at a time.")
 
             val time = OffsetDateTime.now().minusWeeks(2)
             history.retrievePast(messagesToDelete).queue {
