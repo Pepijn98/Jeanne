@@ -18,6 +18,8 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
 import net.dv8tion.jda.webhook.WebhookClientBuilder
 import net.dv8tion.jda.webhook.WebhookMessageBuilder
 import java.awt.Color
+import java.io.File
+import java.io.InputStream
 import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
@@ -39,6 +41,33 @@ class Utils(private val e: MessageReceivedEvent) {
                     .setColor(embedColor())
                     .build()
             e.channel.sendMessage(embed).queue(success)
+        }
+    }
+
+    fun reply(data: InputStream, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
+        if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
+            if (message != null)
+                e.channel.sendFile(data, fileName, build(message)).queue(success)
+            else
+                e.channel.sendFile(data, fileName).queue(success)
+        }
+    }
+
+    fun reply(file: File, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
+        if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
+            if (message != null)
+                e.channel.sendFile(file, fileName, build(message)).queue(success)
+            else
+                e.channel.sendFile(file, fileName).queue(success)
+        }
+    }
+
+    fun reply(bytes: ByteArray, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
+        if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
+            if (message != null)
+                e.channel.sendFile(bytes, fileName, build(message)).queue(success)
+            else
+                e.channel.sendFile(bytes, fileName).queue(success)
         }
     }
 
@@ -136,12 +165,13 @@ class Utils(private val e: MessageReceivedEvent) {
         inline fun catchAll(message: String, channel: MessageChannel?, action: () -> Unit) {
             try {
                 action()
-            } catch (t: Throwable) {
+            } catch (exception: Throwable) {
                 val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
                 val logger = Logger.getGlobal()
-                val errorMessage = "```diff\n" +
-                        "$message:\n" +
-                        "- ${t.message}```"
+                val errorMessage = """```diff
+                    |$message:
+                    |- ${exception.message ?: "Unkown exception"}
+                    |```""".trimMargin("|")
                 channel?.sendMessage(errorMessage)?.queue()
                 val webhookMessage = WebhookMessageBuilder()
                         .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
@@ -150,7 +180,7 @@ class Utils(private val e: MessageReceivedEvent) {
                         .build()
                 webhook.send(webhookMessage)
                 webhook.close()
-                logger.warning("$message > ${t.message}")
+                logger.warning("$message > ${exception.message ?: "Unkown exception"}")
             }
         }
 

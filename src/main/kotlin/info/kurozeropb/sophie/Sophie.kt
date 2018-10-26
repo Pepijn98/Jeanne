@@ -26,7 +26,7 @@ object Sophie {
             "net.dv8tion.jda" to Level.INFO,
             "org.reflections.Reflections" to Level.INFO
     )
-    val games = arrayListOf(
+    private val games = arrayListOf(
             PlayingGame("with Senpai", Game.GameType.DEFAULT),
             PlayingGame("with my master", Game.GameType.DEFAULT),
             PlayingGame("anime", Game.GameType.WATCHING),

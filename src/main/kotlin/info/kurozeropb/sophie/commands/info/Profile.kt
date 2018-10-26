@@ -7,6 +7,8 @@ import info.kurozeropb.sophie.managers.DatabaseManager
 import info.kurozeropb.sophie.utils.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import com.github.kittinunf.fuel.core.HttpException
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -87,21 +89,27 @@ class Profile : Command(
             val mediaType = MediaType.parse("application/json; charset=utf-8")
             val requestBody = RequestBody.create(mediaType, json)
             val apiUrl = Sophie.config.api.url + "/profile"
+            val headers = Sophie.defaultHeaders
+            headers.putAll(mapOf("authorization" to Sophie.config.api.token))
             val request = Request.Builder()
                     .url(apiUrl)
-                    .addHeader("authorization", Sophie.config.api.token)
+                    .headers(Headers.of(headers))
                     .post(requestBody)
                     .build()
 
             val response = Sophie.httpClient.newCall(request).execute()
 
             if (response.isSuccessful) {
-                val file = response.body()!!.bytes()
-                e.channel.sendFile(file, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png").queue()
+                val file = response.body()?.byteStream()
+                if (file != null)
+                    e.reply(file, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
+                else
+                    e.reply("Failed to request profile card please try again later.")
             } else {
+                val code = response.code()
                 val message = response.message()
                 response.close()
-                throw Exception(message)
+                throw HttpException(code, message)
             }
             response.close()
         }

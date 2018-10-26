@@ -8,6 +8,8 @@ import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import java.awt.Color
+import java.io.File
+import java.io.InputStream
 import java.util.*
 import java.util.function.Consumer
 import java.util.logging.Logger
@@ -50,9 +52,21 @@ abstract class Command(
 
     fun MessageReceivedEvent.embedColor(): Color = Utils(this).embedColor()
 
-    fun MessageReceivedEvent.reply(msg: Message, success: Consumer<Message>? = null) = Utils(this).reply(msg, success)
+    fun MessageReceivedEvent.reply(msg: Message, success: Consumer<Message>? = null)
+            = Utils(this).reply(msg, success)
 
-    fun MessageReceivedEvent.reply(builder: EmbedBuilder, success: Consumer<Message>? = null) = Utils(this).reply(builder, success)
+    fun MessageReceivedEvent.reply(builder: EmbedBuilder, success: Consumer<Message>? = null)
+            = Utils(this).reply(builder, success)
 
-    fun MessageReceivedEvent.reply(text: String, success: Consumer<Message>? = null) = Utils(this).reply(text, success)
+    fun MessageReceivedEvent.reply(text: String, success: Consumer<Message>? = null)
+            = Utils(this).reply(text, success)
+
+    fun MessageReceivedEvent.reply(data: InputStream, fileName: String, message: String? = null, success: Consumer<Message>? = null)
+            = Utils(this).reply(data, fileName, message, success)
+
+    fun MessageReceivedEvent.reply(file: File, fileName: String, message: String? = null, success: Consumer<Message>? = null)
+            = Utils(this).reply(file, fileName, message, success)
+
+    fun MessageReceivedEvent.reply(bytes: ByteArray, fileName: String, message: String? = null, success: Consumer<Message>? = null)
+            = Utils(this).reply(bytes, fileName, message, success)
 }
