@@ -42,8 +42,6 @@ class Anime : Command(
                     if (response.isSuccessful && respstring != null) {
                         val anime = Kitsu.Anime.Deserializer().deserialize(respstring)
                         if (anime != null && anime.data.size > 0) {
-                            println(anime.data)
-
                             e.reply(EmbedBuilder()
                                     .setTitle(anime.data[0].attributes.titles.en_jp)
                                     .setDescription(anime.data[0].attributes.synopsis)
