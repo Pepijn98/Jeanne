@@ -15,6 +15,7 @@ import okhttp3.RequestBody
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.set
+import java.io.ByteArrayOutputStream
 
 class Profile : Command(
         name = "profile",
@@ -100,9 +101,17 @@ class Profile : Command(
             val response = Sophie.httpClient.newCall(request).execute()
 
             if (response.isSuccessful) {
-                val file = response.body()?.byteStream()
-                if (file != null)
-                    e.reply(file, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
+                val stream = response.body()?.byteStream() ?: return e.reply("Failed to request profile card please try again later.")
+                val buffer = ByteArrayOutputStream(maxOf(DEFAULT_BUFFER_SIZE, stream.available()))
+                stream.copyTo(buffer)
+                // To byte array
+                val bytes = buffer.toByteArray()
+                // Close streams
+                stream.close()
+                buffer.close()
+
+                if (bytes != null)
+                    e.reply(bytes, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
                 else
                     e.reply("Failed to request profile card please try again later.")
             } else {
