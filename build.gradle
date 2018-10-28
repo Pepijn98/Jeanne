@@ -1,5 +1,5 @@
 group 'info.kurozeropb'
-version '0.3.4-beta'
+version '0.3.4'
 
 buildscript {
     ext {

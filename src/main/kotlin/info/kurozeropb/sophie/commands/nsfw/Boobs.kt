@@ -27,8 +27,8 @@ class Boobs : Command(
 
             // TODO: Donators check
 
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json"))
+            val headers = mutableMapOf("Accept" to "application/json")
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url("http://api.oboobs.ru/boobs/0/1/random")
@@ -54,7 +54,7 @@ class Boobs : Command(
                             if (resp.isSuccessful) {
                                 val body = resp.body()
                                 if (body != null)
-                                    e.channel.sendFile(body.byteStream(), "obutt-${boobs[0].id}.${body.contentType().toString().replace("image/", "")}").queue()
+                                    e.reply(body.byteStream(), "obutt-${boobs[0].id}.${body.contentType().toString().replace("image/", "")}")
                                 else
                                     e.reply("Something went wrong while trying to fetch the image")
                             } else {

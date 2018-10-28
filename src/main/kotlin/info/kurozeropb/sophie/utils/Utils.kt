@@ -1,5 +1,6 @@
 package info.kurozeropb.sophie.utils
 
+import com.github.kittinunf.fuel.core.HttpException
 import net.dv8tion.jda.core.MessageBuilder
 import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.entities.Message
@@ -166,21 +167,32 @@ class Utils(private val e: MessageReceivedEvent) {
             try {
                 action()
             } catch (exception: Throwable) {
-                val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
-                val logger = Logger.getGlobal()
-                val errorMessage = """```diff
-                    |$message:
-                    |- ${exception.message ?: "Unkown exception"}
-                    |```""".trimMargin("|")
-                channel?.sendMessage(errorMessage)?.queue()
-                val webhookMessage = WebhookMessageBuilder()
-                        .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
-                        .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
-                        .setContent(errorMessage)
-                        .build()
-                webhook.send(webhookMessage)
-                webhook.close()
-                logger.warning("$message > ${exception.message ?: "Unkown exception"}")
+                when (exception) {
+                    is HttpException -> {
+                        val errorMessage = """```diff
+                            |$message:
+                            |- ${exception.message ?: "Unkown exception"}
+                            |```""".trimMargin("|")
+                        channel?.sendMessage(errorMessage)?.queue()
+                    }
+                    else -> {
+                        val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
+                        val logger = Logger.getGlobal()
+                        val errorMessage = """```diff
+                            |$message:
+                            |- ${exception.message ?: "Unkown exception"}
+                            |```""".trimMargin("|")
+                        channel?.sendMessage(errorMessage)?.queue()
+                        val webhookMessage = WebhookMessageBuilder()
+                                .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
+                                .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
+                                .setContent(errorMessage)
+                                .build()
+                        webhook.send(webhookMessage)
+                        webhook.close()
+                        logger.warning("$message > ${exception.message ?: "Unkown exception"}")
+                    }
+                }
             }
         }
 

@@ -47,9 +47,14 @@ class Cat : Command(
                                 val body = resp.body()
                                 if (body != null)
                                     e.channel.sendFile(body.byteStream(), "random-cat.${body.contentType().toString().replace("image/", "")}").queue()
-                                else
+                                else {
+                                    println("no")
                                     e.reply("Something went wrong while trying to fetch the image")
+                                }
                             } else {
+                                println(Sophie.defaultHeaders)
+                                println(resp.message())
+                                println("yes")
                                 e.reply("Something went wrong while trying to fetch the image")
                             }
                         } else {
@@ -58,6 +63,7 @@ class Cat : Command(
                     } else {
                         e.reply("Something went wrong while trying to fetch a random image")
                     }
+                    response.close()
                 }
             })
         }

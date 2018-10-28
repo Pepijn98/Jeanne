@@ -22,11 +22,11 @@ class Manga : Command(
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in manga command", e.channel) {
             val name = args.joinToString(" ")
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf(
+            val headers = mutableMapOf(
                     "Content-Type" to "application/vnd.api+json",
                     "Accept" to "application/vnd.api+json"
-            ))
+            )
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url("${Kitsu.baseUrl}/manga?filter[text]=$name")

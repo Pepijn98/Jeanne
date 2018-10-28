@@ -25,8 +25,8 @@ class Pokemon : Command(
             if (args.isEmpty())
                 return e.reply("Which pokemon do you want to search for?")
 
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json"))
+            val headers = mutableMapOf("Accept" to "application/json")
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url("https://raw.githubusercontent.com/jalyna/oakdex-pokedex/master/data/pokemon/${args.joinToString(" ").toLowerCase()}.json")

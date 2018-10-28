@@ -30,8 +30,8 @@ class Catgirl : Command(
             } else
                 "https://nekos.moe/api/v1/random/image?nsfw=false"
 
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json"))
+            val headers = mutableMapOf("Accept" to "application/json")
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url(url)

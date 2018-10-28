@@ -8,14 +8,11 @@ import info.kurozeropb.sophie.utils.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import com.github.kittinunf.fuel.core.HttpException
-import okhttp3.Headers
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.set
-import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 class Profile : Command(
         name = "profile",
@@ -90,38 +87,36 @@ class Profile : Command(
             val mediaType = MediaType.parse("application/json; charset=utf-8")
             val requestBody = RequestBody.create(mediaType, json)
             val apiUrl = Sophie.config.api.url + "/profile"
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("authorization" to Sophie.config.api.token))
+            val headers = mutableMapOf("authorization" to Sophie.config.api.token)
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .url(apiUrl)
                     .headers(Headers.of(headers))
                     .post(requestBody)
                     .build()
 
-            val response = Sophie.httpClient.newCall(request).execute()
-
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body == null) {
-                    response.close()
-                    return e.reply("Failed to request profile card please try again later.")
+            Sophie.httpClient.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    throw e
                 }
 
-                val stream = body.byteStream()
-                val buffer = ByteArrayOutputStream(maxOf(DEFAULT_BUFFER_SIZE, stream.available()))
-                stream.copyTo(buffer)
-                val bytes = buffer.toByteArray()
-                stream.close()
-                buffer.close()
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body == null) {
+                            response.close()
+                            return e.reply("Failed to request profile card please try again later.")
+                        }
 
-                e.reply(bytes, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
-            } else {
-                val code = response.code()
-                val message = response.message()
-                response.close()
-                throw HttpException(code, message)
-            }
-            response.close()
+                        e.reply(body.byteStream(), "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
+                    } else {
+                        val code = response.code()
+                        val message = response.message()
+                        response.close()
+                        throw HttpException(code, message)
+                    }
+                }
+            })
         }
     }
 }

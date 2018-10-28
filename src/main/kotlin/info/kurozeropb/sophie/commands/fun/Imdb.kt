@@ -24,8 +24,8 @@ class Imdb : Command(
                 return e.reply("Which movie/serie do you want to search?")
 
             val baseUrl = "http://www.omdbapi.com/?apikey=${Sophie.config.api.imdbKey}"
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json"))
+            val headers = mutableMapOf("Accept" to "application/json")
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url("$baseUrl&t=${args.joinToString(" ")}")

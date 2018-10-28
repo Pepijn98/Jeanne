@@ -47,8 +47,8 @@ class Cleverbot : Command(
                 e.channel.sendTyping().queue()
 
                 val owner = e.jda.getUserById(Sophie.config.developer)
-                val headers = Sophie.defaultHeaders
-                headers.putAll(mapOf("Accept" to "application/json"))
+                val headers = mutableMapOf("Accept" to "application/json")
+                headers.putAll(Sophie.defaultHeaders)
                 val request = Request.Builder()
                         .headers(Headers.of(headers))
                         .url("http://api.program-o.com/v2/chatbot/?bot_id=12&say=$question&convo_id=${user.id}&format=json")
