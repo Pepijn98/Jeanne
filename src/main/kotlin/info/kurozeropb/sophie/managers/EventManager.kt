@@ -49,25 +49,24 @@ class EventManager : ListenerAdapter() {
 
         val content = e.message.contentRaw
         val selfId = e.jda.selfUser.id
+        val ctx = Utils(e)
 
         if (e.guild != null && !e.guild.isAvailable)
             return
         if (e.isWebhookMessage || e.author.isFake || e.author.isBot || e.author.id == selfId)
             return
 
-        var prefix = DatabaseManager.guildPrefixes[e.guild.id]
+        var prefix = DatabaseManager.guildPrefixes[e.guild?.id] ?: Sophie.config.prefix
         if (prefix == "%mention%")
             prefix = e.jda.selfUser.asMention
-        if (prefix == null)
-            prefix = Sophie.config.prefix
 
         if (content.matches("^<@!?$selfId>$".toRegex())) {
-            Utils(e).reply("My prefix for this guild is: **$prefix**")
+            ctx.reply("My prefix for this guild is: **$prefix**")
             return
         }
 
         val isMentionPrefix = content.matches("^<@!?$selfId>\\s.*".toRegex())
-        if (!isMentionPrefix && !content.startsWith(prefix, true)) {
+        if (isMentionPrefix.not() && content.startsWith(prefix, true).not()) {
             if (e.isFromType(ChannelType.PRIVATE))
                 return
 
@@ -95,7 +94,7 @@ class EventManager : ListenerAdapter() {
                         message = message.replace("%oldLevel%", level.toString())
                         message = message.replace("%newLevel%", currLevel.toString())
                         message = message.replace("%points%", points.toString())
-                        Utils(e).reply(message)
+                        ctx.reply(message)
                     }
                 } else {
                     DatabaseManager.usersData[e.author.id]!!["points"] = points
@@ -116,8 +115,10 @@ class EventManager : ListenerAdapter() {
         val args = allArgs.drop(1)
 
         if (command != null) {
-            if (e.isFromType(ChannelType.PRIVATE) && command.allowPrivate.not())
+            if (e.isFromType(ChannelType.PRIVATE) && command.allowPrivate.not()) {
+                ctx.reply("This command can only be used in a server")
                 return
+            }
 
             if (e.author.id != Sophie.config.developer) {
                 val cooldown = cooldowns.find { it.id == e.author.id && it.command.name == command.name }
@@ -127,7 +128,7 @@ class EventManager : ListenerAdapter() {
                     val timeLeft = command.cooldown - timeUntil
 
                     if (timeUntil < command.cooldown && command.name == cooldown.command.name) {
-                        Utils(e).reply("Command is on cooldown, $timeLeft seconds left.")
+                        ctx.reply("Command is on cooldown, $timeLeft seconds left.")
                         return
                     }
 
@@ -139,25 +140,25 @@ class EventManager : ListenerAdapter() {
             }
 
             if (command.isDeveloperOnly && e.author.id != Sophie.config.developer) {
-                Utils(e).reply("This command can only be used by my developer")
+                ctx.reply("This command can only be used by my developer")
                 return
             }
 
-            if (!e.isFromType(ChannelType.PRIVATE) && command.botPermissions.isNotEmpty()) {
+            if (e.isFromType(ChannelType.PRIVATE).not() && command.botPermissions.isNotEmpty()) {
                 val hasPerms = e.guild.selfMember.hasPermission(e.textChannel, command.botPermissions)
                 if (!hasPerms) {
-                    Utils(e).reply("""
+                    ctx.reply("""
                         The bot is missing certain permissions required by this command
-                        Required permissions are: ${command.botPermissions.joinToString(", ")}
+                        Required permissions are: ${command.botPermissions.joinToString(", ") { it.getName() }}
                         """.trimIndent())
                     return
                 }
             }
 
-            if (!e.isFromType(ChannelType.PRIVATE) && command.userPermissions.isNotEmpty()) {
+            if (e.isFromType(ChannelType.PRIVATE).not() && command.userPermissions.isNotEmpty()) {
                 val hasPerms = e.member.hasPermission(e.textChannel, command.userPermissions)
                 if (!hasPerms && e.author.id != Sophie.config.developer) {
-                    Utils(e).reply("""
+                    ctx.reply("""
                         You are missing certain permissions required by this command
                         Required permissions are: ${command.userPermissions.joinToString(", ")}
                         """.trimIndent())

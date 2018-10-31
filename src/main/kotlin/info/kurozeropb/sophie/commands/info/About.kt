@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class About : Command(
         name = "about",
-        category = "info",
+        category = Category.INFO,
         description = "Shows info about me",
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)
 ) {

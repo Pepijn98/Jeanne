@@ -4,7 +4,6 @@ import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.entities.TextChannel
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
@@ -12,7 +11,7 @@ import java.time.temporal.ChronoField
 class Channel : Command(
         name = "channelinfo",
         aliases = listOf("channel"),
-        category = "info",
+        category = Category.INFO,
         description = "Get info about the current channel",
         allowPrivate = false,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)

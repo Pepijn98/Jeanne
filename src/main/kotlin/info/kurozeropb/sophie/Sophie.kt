@@ -43,7 +43,7 @@ object Sophie {
         val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
         loggerLevels.forEach { key, value -> loggerContext.getLogger(key).level = value }
         config = ConfigManager.read()
-        val token = if (config.env.startsWith("dev")) config.devToken else config.token
+        val token = if (config.env.startsWith("dev")) config.tokens.dev else if (config.env.startsWith("test")) "" else config.tokens.prod
         httpClient = if (config.proxy.enabled) OkHttpClient.Builder().proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.proxy.host, config.proxy.port))).build() else OkHttpClient.Builder().build()
         embedColor = Color.decode("0xBA2F6B")
         Utils.catchAll("Exception occured in main", null) {

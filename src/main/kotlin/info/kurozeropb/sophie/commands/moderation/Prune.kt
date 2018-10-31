@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 class Prune : Command(
         name = "prune",
         aliases = listOf("purge", "clear"),
-        category = "moderation",
+        category = Category.MODERATION,
         allowPrivate = false,
         description = "Prunes the given number of messages, defaults to 50 messages",
         usage = "[messages_to_delete: number]",

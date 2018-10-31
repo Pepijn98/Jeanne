@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 class Guild : Command(
         name = "guildinfo",
         aliases = listOf("serverinfo", "guild", "server"),
-        category = "info",
+        category = Category.INFO,
         description = "Get info about the guild",
         allowPrivate = false,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)

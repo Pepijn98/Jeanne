@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.EmbedBuilder
 
 class Anime : Command(
         name = "anime",
-        category = "fun",
+        category = Category.FUN,
         description = "Find information about an anime",
         usage = "<anime_name: string>",
         cooldown = 10,

@@ -11,7 +11,7 @@ import java.text.DecimalFormat
 
 class Stats : Command(
         name = "stats",
-        category = "info",
+        category = Category.INFO,
         description = "Shows stats about Sophie",
         cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE)

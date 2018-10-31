@@ -12,7 +12,7 @@ import java.io.IOException
 class Boobs : Command(
         name = "boobs",
         aliases = listOf("tits"),
-        category = "nsfw",
+        category = Category.NSFW,
         description = "Sends a random boobs pic",
         cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)

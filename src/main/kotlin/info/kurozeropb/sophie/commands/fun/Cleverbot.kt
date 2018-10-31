@@ -13,7 +13,7 @@ import java.io.IOException
 class Cleverbot : Command(
         name = "cleverbot",
         aliases = listOf("cb"),
-        category = "fun",
+        category = Category.FUN,
         description = "Chat with the bot",
         usage = "<question: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)

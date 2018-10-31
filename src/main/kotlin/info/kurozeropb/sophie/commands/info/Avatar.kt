@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 class Avatar : Command(
         name = "avatar",
         aliases = listOf("ava", "pfp", "avi"),
-        category = "info",
+        category = Category.INFO,
         description = "Get your or someone else's avatar",
         usage = "[username: mention|string]",
         allowPrivate = false,

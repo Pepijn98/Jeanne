@@ -14,7 +14,7 @@ import org.litote.kmongo.set
 @Suppress("unused")
 class Settings : Command(
         name = "settings",
-        category = "moderation",
+        category = Category.MODERATION,
         description = "Setup the settings for the current guild",
         allowPrivate = false,
         usage = "(Full usage at https://sophiebot.info/settings)",

@@ -16,7 +16,7 @@ import java.io.IOException
 
 class Profile : Command(
         name = "profile",
-        category = "info",
+        category = Category.INFO,
         description = "View your profile card",
         usage = "[\"large\"|\"small\"|<\"update\"] [\"bg/background\"|\"about\"] [new_value: string]>",
         aliases = listOf("me", "level", "card"),
@@ -86,8 +86,8 @@ class Profile : Command(
 
             val mediaType = MediaType.parse("application/json; charset=utf-8")
             val requestBody = RequestBody.create(mediaType, json)
-            val apiUrl = Sophie.config.api.url + "/profile"
-            val headers = mutableMapOf("authorization" to Sophie.config.api.token)
+            val apiUrl = Sophie.config.apiUrl + "/profile"
+            val headers = mutableMapOf("authorization" to Sophie.config.tokens.kurozero)
             headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .url(apiUrl)

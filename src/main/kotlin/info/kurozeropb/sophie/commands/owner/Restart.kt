@@ -1,4 +1,4 @@
-package info.kurozeropb.sophie.commands.general
+package info.kurozeropb.sophie.commands.owner
 
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class Restart : Command(
         name = "restart",
-        category = "general",
+        category = Category.OWNER,
         description = "Restarts the bot",
         isDeveloperOnly = true,
         isHidden = true,

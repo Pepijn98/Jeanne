@@ -1,16 +1,13 @@
 package info.kurozeropb.sophie.utils
 
-import com.github.kittinunf.fuel.core.HttpException
+import info.kurozeropb.sophie.PlayingGame
 import net.dv8tion.jda.core.MessageBuilder
-import net.dv8tion.jda.core.entities.ChannelType
-import net.dv8tion.jda.core.entities.Message
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.Member
-import net.dv8tion.jda.core.entities.MessageChannel
+import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
@@ -24,6 +21,22 @@ import java.io.InputStream
 import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
+
+object Games {
+    val list = listOf(
+            PlayingGame("with Senpai", Game.GameType.DEFAULT),
+            PlayingGame("with my master", Game.GameType.DEFAULT),
+            PlayingGame("anime", Game.GameType.WATCHING),
+            PlayingGame("secret things", Game.GameType.WATCHING),
+            PlayingGame("with your feelings", Game.GameType.DEFAULT),
+            PlayingGame("https://sophiebot.info", Game.GameType.WATCHING),
+            PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
+            PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
+            PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
+            PlayingGame("%USERSIZE% users", Game.GameType.WATCHING),
+            PlayingGame("music", Game.GameType.LISTENING)
+    )
+}
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Utils(private val e: MessageReceivedEvent) {
@@ -167,7 +180,7 @@ class Utils(private val e: MessageReceivedEvent) {
             try {
                 action()
             } catch (exception: Throwable) {
-                val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
+                val webhook = WebhookClientBuilder(Sophie.config.tokens.error).build()
                 val logger = Logger.getGlobal()
                 val errorMessage = """```diff
                             |$message:

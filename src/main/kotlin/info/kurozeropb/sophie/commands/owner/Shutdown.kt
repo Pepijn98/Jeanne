@@ -1,4 +1,4 @@
-package info.kurozeropb.sophie.commands.general
+package info.kurozeropb.sophie.commands.owner
 
 import info.kurozeropb.sophie.ExitStatus
 import info.kurozeropb.sophie.Sophie
@@ -11,7 +11,7 @@ import kotlin.system.exitProcess
 class Shutdown : Command(
         name = "shutdown",
         aliases = listOf("stop"),
-        category = "general",
+        category = Category.OWNER,
         description = "Shutdown the bot",
         isDeveloperOnly = true,
         isHidden = true,

@@ -29,8 +29,8 @@ class DatabaseManager(guild: Guild) {
         fun initialize(config: Config) {
             println("Connecting to the database... ")
             val milli = measureTimeMillis {
-                client = KMongo.createClient(config.db.host, config.db.port)
-                db = client.getDatabase(config.db.name)
+                client = KMongo.createClient(config.database.host, config.database.port)
+                db = client.getDatabase(config.database.name)
                 guilds = db.getCollection<dbGuild>("guilds")
                 users = db.getCollection<dbUser>("users")
                 val allGuilds = guilds.find("{}")

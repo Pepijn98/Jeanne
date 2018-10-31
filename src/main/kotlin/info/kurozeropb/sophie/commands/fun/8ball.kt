@@ -8,7 +8,7 @@ import java.util.*
 
 class EightBall : Command(
         name = "8ball",
-        category = "fun",
+        category = Category.FUN,
         description = "Ask the magic 8 ball",
         usage = "<question: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)

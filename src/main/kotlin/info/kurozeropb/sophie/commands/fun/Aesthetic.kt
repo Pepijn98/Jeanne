@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 class Aesthetic : Command(
         name = "aesthetic",
         aliases = listOf("aes"),
-        category = "fun",
+        category = Category.FUN,
         description = "Convert text to aesthetic text",
         usage = "<text: string>",
         botPermissions = listOf(Permission.MESSAGE_WRITE)

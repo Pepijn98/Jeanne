@@ -11,7 +11,7 @@ import java.io.IOException
 
 class Imdb : Command(
         name = "imdb",
-        category = "fun",
+        category = Category.FUN,
         description = "Search for a movie on imdb",
         usage = "<movie|serie: string>",
         cooldown = 20,
@@ -23,7 +23,7 @@ class Imdb : Command(
             if (args.isEmpty())
                 return e.reply("Which movie/serie do you want to search?")
 
-            val baseUrl = "http://www.omdbapi.com/?apikey=${Sophie.config.api.imdbKey}"
+            val baseUrl = "http://www.omdbapi.com/?apikey=${Sophie.config.tokens.imdb}"
             val headers = mutableMapOf("Accept" to "application/json")
             headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()

@@ -1,4 +1,4 @@
-package info.kurozeropb.sophie.commands.general
+package info.kurozeropb.sophie.commands.info
 
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
@@ -8,7 +8,7 @@ import java.util.function.Consumer
 
 class Ping : Command(
         name = "ping",
-        category = "general",
+        category = Category.INFO,
         description = "Returns an estimated ping to Discord's servers",
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {

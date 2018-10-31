@@ -17,7 +17,7 @@ import kotlin.system.exitProcess
 
 abstract class Command(
         val name: String,
-        val category: String,
+        val category: Category,
         val description: String,
         val usage: String? = null,
         val aliases: List<String> = listOf(),
@@ -32,6 +32,14 @@ abstract class Command(
 
     init {
         register()
+    }
+
+    enum class Category(val lower: String) {
+        FUN("fun"),
+        OWNER("owner"),
+        INFO("info"),
+        MODERATION("moderation"),
+        NSFW("nsfw")
     }
 
     abstract suspend fun execute(args: List<String>, e: MessageReceivedEvent)

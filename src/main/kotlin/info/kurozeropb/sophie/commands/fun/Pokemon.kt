@@ -13,7 +13,7 @@ import java.io.IOException
 // https://raw.githubusercontent.com/jalyna/oakdex-pokedex/master/data/pokemon.json
 class Pokemon : Command(
         name = "pokemon",
-        category = "fun",
+        category = Category.FUN,
         cooldown = 20,
         description = "Search for a pokemon by name",
         usage = "<pokemon_name: string>",

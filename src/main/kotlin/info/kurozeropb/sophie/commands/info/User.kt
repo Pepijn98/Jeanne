@@ -11,7 +11,7 @@ import java.time.temporal.ChronoField
 class User : Command(
         name = "userinfo",
         aliases = listOf("memberinfo", "member", "user"),
-        category = "info",
+        category = Category.INFO,
         description = "Get info about a guild member",
         usage = "[username: mention|string]",
         allowPrivate = false,

@@ -14,7 +14,7 @@ import java.io.IOException
 class Catgirl : Command(
         name = "catgirl",
         aliases = listOf("catgirls", "neko", "nekos"),
-        category = "fun",
+        category = Category.FUN,
         description = "Sends a cute catgirl from https://nekos.moe",
         usage = "[\"nsfw\"]",
         cooldown = 10,

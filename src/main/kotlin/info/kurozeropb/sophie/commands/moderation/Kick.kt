@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class Kick : Command(
         name = "kick",
-        category = "moderation",
+        category = Category.MODERATION,
         allowPrivate = false,
         description = "Kick a guild member",
         usage = "<member: mention> [reason: string]",

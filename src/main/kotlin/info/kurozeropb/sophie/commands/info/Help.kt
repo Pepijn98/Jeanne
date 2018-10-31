@@ -11,7 +11,7 @@ import java.lang.StringBuilder
 
 class Help : Command(
         name = "help",
-        category = "info",
+        category = Category.INFO,
         cooldown = 2,
         description = "Shows this help message",
         usage = "[<\"cmd/command\"|\"ctg/category\"> <command_name|category_name: string>]",
@@ -21,9 +21,7 @@ class Help : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in help command", e.channel) {
-            var prefix = DatabaseManager.guildPrefixes[e.guild.id]
-            if (prefix == null)
-                prefix = Sophie.config.prefix
+            var prefix = DatabaseManager.guildPrefixes[e.guild?.id] ?: Sophie.config.prefix
             if (prefix == "%mention%")
                 prefix = e.jda.selfUser.asMention
 
@@ -31,9 +29,8 @@ class Help : Command(
                 0 -> {
                     val commandBuilder = StringBuilder()
                     commandBuilder.append("# Categories\n\n")
-                    var categories = Registry.commands.map { it.category }
-                    categories = categories.asSequence().distinct().sorted().toList()
-                    categories.forEach { category -> commandBuilder.append("- $category\n") }
+                    val categories = Registry.commands.map { it.category.lower }
+                    categories.asSequence().distinct().sorted().toList().forEach { category -> commandBuilder.append("- $category\n") }
                     commandBuilder.append("\n> Use ${prefix}help category <category_name>")
                     commandBuilder.append("\n> Or ${prefix}help ctg <category_name>")
 
@@ -48,7 +45,7 @@ class Help : Command(
                             val category = args.subList(1, args.size).joinToString(" ")
                             val commands = Registry.commands
                                     .asSequence()
-                                    .filter { it.category == category }
+                                    .filter { it.category.lower == category }
                                     .sortedWith(compareBy(Command::name, Command::cooldown))
                                     .toList()
 
@@ -90,6 +87,7 @@ class Help : Command(
                                 sb.append("- Sub Commands      ->   ${command.subCommands.joinToString(", ")}\n")
                                 if (command.usage != null)
                                     sb.append("- Usage             ->   $prefix${command.name} ${command.usage}\n")
+                                sb.append("- Category          ->   ${command.category.lower}\n")
                                 sb.append("- Allow Private     ->   ${if (command.allowPrivate) "Yes" else "No"}\n")
                                 sb.append("- Developer Only    ->   ${if (command.isDeveloperOnly) "Yes" else "No"}\n")
                                 sb.append("- User permissions  ->   ${command.userPermissions.joinToString(", ")}\n")

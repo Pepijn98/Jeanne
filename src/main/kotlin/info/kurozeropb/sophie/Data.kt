@@ -31,19 +31,23 @@ data class User(
         val background: String = "https://b.catgirlsare.sexy/o4xm.png"
 )
 
-data class DBConfig(
+data class Tokens(
+        val dev: String,
+        val test: String,
+        val prod: String,
+        val error: String,
+        val wolke: String,
+        val imdb: String,
+        val kurozero: String
+)
+
+data class Database(
         val host: String,
         val port: Int,
         val name: String
 )
 
-data class ApiConfig(
-        val url: String,
-        val token: String,
-        val imdbKey: String
-)
-
-data class ProxyConfig(
+data class Proxy(
         val enabled: Boolean,
         val host: String,
         val port: Int
@@ -53,13 +57,11 @@ data class Config(
         val version: String,
         val env: String,
         val prefix: String,
-        val devToken: String,
-        val token: String,
-        val eWebhook: String,
         val developer: String,
-        val db: DBConfig,
-        val api: ApiConfig,
-        val proxy: ProxyConfig
+        val apiUrl: String,
+        val tokens: Tokens,
+        val database: Database,
+        val proxy: Proxy
 )
 
 data class Cooldown(

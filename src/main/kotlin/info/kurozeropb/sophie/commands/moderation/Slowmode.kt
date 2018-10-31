@@ -9,7 +9,7 @@ import java.lang.NumberFormatException
 class Slowmode : Command(
         name = "slowmode",
         aliases = listOf("slow"),
-        category = "moderation",
+        category = Category.MODERATION,
         allowPrivate = false,
         description = "Set slowmode for the current channel",
         usage = "<seconds: number>",

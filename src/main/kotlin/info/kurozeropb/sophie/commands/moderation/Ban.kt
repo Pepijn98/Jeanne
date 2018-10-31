@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class Ban : Command(
         name = "ban",
-        category = "moderation",
+        category = Category.MODERATION,
         allowPrivate = false,
         description = "Ban a guild member",
         usage = "<member: mention> [days: number] [reason: string]",
