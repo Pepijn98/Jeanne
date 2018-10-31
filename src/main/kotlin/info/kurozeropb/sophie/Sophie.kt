@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import info.kurozeropb.sophie.utils.Games
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
@@ -25,19 +26,6 @@ object Sophie {
             "org.mongodb.driver" to Level.WARN,
             "net.dv8tion.jda" to Level.INFO,
             "org.reflections.Reflections" to Level.INFO
-    )
-    private val games = arrayListOf(
-            PlayingGame("with Senpai", Game.GameType.DEFAULT),
-            PlayingGame("with my master", Game.GameType.DEFAULT),
-            PlayingGame("anime", Game.GameType.WATCHING),
-            PlayingGame("secret things", Game.GameType.WATCHING),
-            PlayingGame("with your feelings", Game.GameType.DEFAULT),
-            PlayingGame("https://sophiebot.info", Game.GameType.WATCHING),
-            PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
-            PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
-            PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
-            PlayingGame("%USERSIZE% users", Game.GameType.WATCHING),
-            PlayingGame("music", Game.GameType.LISTENING)
     )
 
     lateinit var shardManager: ShardManager
@@ -78,7 +66,7 @@ object Sophie {
 
         GlobalScope.async {
             Utils.setInterval(600000) {
-                val game = games[Math.floor((Math.random() * games.size)).toInt()]
+                val game = Games.list[Math.floor((Math.random() * Games.list.size)).toInt()]
                 val name = game.name
                         .replace(Regex("%USERSIZE%"), shardManager.users.size.toString())
                         .replace(Regex("%GUILDSIZE%"), shardManager.guilds.size.toString())

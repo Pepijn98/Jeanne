@@ -21,7 +21,7 @@ class Anime : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in anime command", e.channel) {
-            val name = args.joinToString(" ")
+            val name = args.joinToString("-").toLowerCase()
             val headers = mutableMapOf(
                     "Content-Type" to "application/vnd.api+json",
                     "Accept" to "application/vnd.api+json"
@@ -42,6 +42,12 @@ class Anime : Command(
                     if (response.isSuccessful && respstring != null) {
                         val anime = Kitsu.Anime.Deserializer().deserialize(respstring)
                         if (anime != null && anime.data.size > 0) {
+                            val releaseDate =
+                                    if (anime.data[0].attributes.startDate.isNullOrEmpty())
+                                        "TBA"
+                                    else
+                                        "${anime.data[0].attributes.startDate} until ${anime.data[0].attributes.endDate ?: "TBA"}"
+
                             e.reply(EmbedBuilder()
                                     .setTitle(anime.data[0].attributes.titles.en_jp)
                                     .setDescription(anime.data[0].attributes.synopsis)
@@ -52,13 +58,13 @@ class Anime : Command(
                                     .addField("Rating", anime.data[0].attributes.averageRating, true)
                                     .addField("Rank", "#" + anime.data[0].attributes.ratingRank, true)
                                     .addField("Favorites", anime.data[0].attributes.favoritesCount.toString(), true)
-                                    .addField("Start/End", anime.data[0].attributes.startDate + " until " + anime.data[0].attributes.endDate, false)
+                                    .addField("Start/End", releaseDate, false)
                             )
                         } else {
                             e.reply("Could not find an anime with the name **$name**")
                         }
                     } else {
-                        e.reply("Could not find an anime with the name **$name**")
+                        e.reply("HTTP Exception ${response.code()} ${response.message()}")
                     }
                 }
             })

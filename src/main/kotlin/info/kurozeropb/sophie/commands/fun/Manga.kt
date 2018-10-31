@@ -21,7 +21,7 @@ class Manga : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in manga command", e.channel) {
-            val name = args.joinToString(" ")
+            val name = args.joinToString("-").toLowerCase()
             val headers = mutableMapOf(
                     "Content-Type" to "application/vnd.api+json",
                     "Accept" to "application/vnd.api+json"
@@ -42,6 +42,12 @@ class Manga : Command(
                     if (response.isSuccessful && respstring != null) {
                         val manga = Kitsu.Manga.Deserializer().deserialize(respstring)
                         if (manga != null && manga.data.size > 0) {
+                            val releaseDate =
+                                    if (manga.data[0].attributes.startDate.isNullOrEmpty())
+                                        "TBA"
+                                    else
+                                        "${manga.data[0].attributes.startDate} until ${manga.data[0].attributes.endDate ?: "TBA"}"
+
                             e.reply(EmbedBuilder()
                                     .setTitle(manga.data[0].attributes.titles.en_jp)
                                     .setDescription(manga.data[0].attributes.synopsis)
@@ -52,11 +58,13 @@ class Manga : Command(
                                     .addField("Rating", manga.data[0].attributes.averageRating, true)
                                     .addField("Rank", "#" + manga.data[0].attributes.ratingRank, true)
                                     .addField("Favorites", manga.data[0].attributes.favoritesCount.toString(), true)
-                                    .addField("Start/End", manga.data[0].attributes.startDate + " until " + manga.data[0].attributes.endDate, false)
+                                    .addField("Start/End", releaseDate, false)
                             )
                         } else {
                             e.reply("Could not find a manga with the name **$name**")
                         }
+                    } else {
+                        e.reply("HTTP Exception ${response.code()} ${response.message()}")
                     }
                 }
             })

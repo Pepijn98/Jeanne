@@ -20,7 +20,6 @@ import info.kurozeropb.sophie.Cooldown
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.Game
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent

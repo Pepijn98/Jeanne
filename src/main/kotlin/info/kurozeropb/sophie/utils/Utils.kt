@@ -167,32 +167,21 @@ class Utils(private val e: MessageReceivedEvent) {
             try {
                 action()
             } catch (exception: Throwable) {
-                when (exception) {
-                    is HttpException -> {
-                        val errorMessage = """```diff
+                val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
+                val logger = Logger.getGlobal()
+                val errorMessage = """```diff
                             |$message:
                             |- ${exception.message ?: "Unkown exception"}
                             |```""".trimMargin("|")
-                        channel?.sendMessage(errorMessage)?.queue()
-                    }
-                    else -> {
-                        val webhook = WebhookClientBuilder(Sophie.config.eWebhook).build()
-                        val logger = Logger.getGlobal()
-                        val errorMessage = """```diff
-                            |$message:
-                            |- ${exception.message ?: "Unkown exception"}
-                            |```""".trimMargin("|")
-                        channel?.sendMessage(errorMessage)?.queue()
-                        val webhookMessage = WebhookMessageBuilder()
-                                .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
-                                .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
-                                .setContent(errorMessage)
-                                .build()
-                        webhook.send(webhookMessage)
-                        webhook.close()
-                        logger.warning("$message > ${exception.message ?: "Unkown exception"}")
-                    }
-                }
+                channel?.sendMessage(errorMessage)?.queue()
+                val webhookMessage = WebhookMessageBuilder()
+                        .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
+                        .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
+                        .setContent(errorMessage)
+                        .build()
+                webhook.send(webhookMessage)
+                webhook.close()
+                logger.warning("$message > ${exception.message ?: "Unkown exception"}")
             }
         }
 
