@@ -1,5 +1,7 @@
 package info.kurozeropb.sophie.managers
 
+import com.github.natanbc.weeb4j.TokenType
+import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.sophie.Guild
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.User
@@ -32,6 +34,14 @@ class EventManager : ListenerAdapter() {
 
     override fun onReady(e: ReadyEvent) {
         val selfUser = e.jda.selfUser
+        Sophie.defaultHeaders = mutableMapOf("User-Agent" to "${selfUser.name.replace(" ", "_")}/v${Sophie.config.version} (sophiebot.info)")
+        Sophie.isReady = true
+        Sophie.weebApi = Weeb4J.Builder()
+                .setToken(TokenType.WOLKE, Sophie.config.tokens.wolke)
+                .setBotId(selfUser.idLong)
+                .setBotInfo(selfUser.name, Sophie.config.version, Sophie.config.env)
+                .build()
+
         println("""
         ||-=========================================================
         || Account info: ${selfUser.name}#${selfUser.discriminator} (ID: ${selfUser.id})
@@ -39,8 +49,6 @@ class EventManager : ListenerAdapter() {
         || Default prefix: ${Sophie.config.prefix}
         ||-=========================================================
         """.trimMargin("|"))
-        Sophie.defaultHeaders = mutableMapOf("User-Agent" to "${selfUser.name} (sophiebot.info, v${Sophie.config.version})")
-        Sophie.isReady = true
     }
 
     override fun onMessageReceived(e: MessageReceivedEvent) {

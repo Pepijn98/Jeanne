@@ -36,10 +36,11 @@ abstract class Command(
 
     enum class Category(val lower: String) {
         FUN("fun"),
-        OWNER("owner"),
         INFO("info"),
         MODERATION("moderation"),
-        NSFW("nsfw")
+        NSFW("nsfw"),
+        OWNER("owner"),
+        REACTIONS("reactions")
     }
 
     abstract suspend fun execute(args: List<String>, e: MessageReceivedEvent)

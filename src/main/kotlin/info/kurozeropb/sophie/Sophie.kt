@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.sophie.utils.Games
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -33,6 +34,7 @@ object Sophie {
     lateinit var config: Config
     lateinit var httpClient: OkHttpClient
     lateinit var defaultHeaders: MutableMap<String, String>
+    lateinit var weebApi: Weeb4J
 
     var isReady: Boolean = false
     val uptime: Long
