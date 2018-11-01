@@ -155,10 +155,15 @@ class Utils(private val e: MessageReceivedEvent) {
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        if (response.isSuccessful)
+                        if (response.isSuccessful) {
                             logger.info("Success sending guild count to $name")
-                        else
-                            throw HttpException(response.code(), response.message())
+                            response.close()
+                        } else {
+                            val code = response.code()
+                            val message = response.message()
+                            response.close()
+                            throw HttpException(code, message)
+                        }
                     }
                 })
             }
