@@ -33,22 +33,30 @@ class EventManager : ListenerAdapter() {
     private val cooldowns: MutableList<Cooldown> = mutableListOf()
 
     override fun onReady(e: ReadyEvent) {
-        val selfUser = e.jda.selfUser
-        Sophie.defaultHeaders = mutableMapOf("User-Agent" to "${selfUser.name.replace(" ", "_")}/v${Sophie.config.version} (sophiebot.info)")
-        Sophie.isReady = true
-        Sophie.weebApi = Weeb4J.Builder()
-                .setToken(TokenType.WOLKE, Sophie.config.tokens.wolke)
-                .setBotId(selfUser.idLong)
-                .setBotInfo(selfUser.name, Sophie.config.version, Sophie.config.env)
-                .build()
+        if (e.jda.shardInfo.shardId == Sophie.shardManager.shardsTotal - 1) {
+            val selfUser = e.jda.selfUser
+            Sophie.defaultHeaders = mutableMapOf("User-Agent" to "${selfUser.name.replace(" ", "_")}/v${Sophie.config.version} (sophiebot.info)")
+            Sophie.isReady = true
+            Sophie.weebApi = Weeb4J.Builder()
+                    .setToken(TokenType.WOLKE, Sophie.config.tokens.wolke)
+                    .setBotId(selfUser.idLong)
+                    .setBotInfo(selfUser.name, Sophie.config.version, Sophie.config.env)
+                    .build()
 
-        println("""
-        ||-=========================================================
-        || Account info: ${selfUser.name}#${selfUser.discriminator} (ID: ${selfUser.id})
-        || Connected to ${e.jda.guilds.size} guilds, ${e.jda.textChannels.size + e.jda.voiceChannels.size} channels
-        || Default prefix: ${Sophie.config.prefix}
-        ||-=========================================================
-        """.trimMargin("|"))
+            println("""
+            ||-=========================================================
+            || Account info: ${selfUser.name}#${selfUser.discriminator} (ID: ${selfUser.id})
+            || Connected to ${Sophie.shardManager.guilds.size} guilds, ${Sophie.shardManager.textChannels.size + Sophie.shardManager.voiceChannels.size} channels
+            || Default prefix: ${Sophie.config.prefix}
+            ||-=========================================================
+            """.trimMargin("|"))
+
+            GlobalScope.async {
+                Utils.setInterval(1_800_000) { // Every 30 minutes
+                    Utils.sendGuildCountAll(Sophie.shardManager.guilds.size, Sophie.shardManager.shardsTotal)
+                }
+            }
+        }
     }
 
     override fun onMessageReceived(e: MessageReceivedEvent) {

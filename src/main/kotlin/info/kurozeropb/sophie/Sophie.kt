@@ -80,7 +80,14 @@ object Sophie {
 }
 
 enum class BotLists(val url: String) {
-    DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats")
+    BOTLIST_SPACE("https://botlist.space/api/bots/237578660708745216"),
+    BOTSFORDISCORD("https://botsfordiscord.com/api/bot/237578660708745216"),
+    BOTS_ONDISCORD("https://bots.ondiscord.xyz/bot-api/bots/237578660708745216/guilds"),
+    DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
+    DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
+    DISCORDBOT_WORLD("https://discordbot.world/bot/237578660708745216/stats"),
+    BOTS_DISCORD_PW("https://bots.discord.pw/api/bots/237578660708745216/stats"),
+    DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
 }
 
 enum class ExitStatus(val code: Int) {

@@ -1,5 +1,6 @@
 package info.kurozeropb.sophie.utils
 
+import com.github.kittinunf.fuel.core.HttpException
 import info.kurozeropb.sophie.BotLists
 import info.kurozeropb.sophie.PlayingGame
 import net.dv8tion.jda.core.MessageBuilder
@@ -7,6 +8,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
@@ -101,41 +104,64 @@ class Utils(private val e: MessageReceivedEvent) {
         val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
         val nullToNull = null to null
 
+        fun sendGuildCountAll(guildCount: Int, shardCount: Int) {
+            Sophie.config.tokens.lists.forEach { key, _ ->
+                when (key.toUpperCase()) {
+                    BotLists.BOTLIST_SPACE.name -> sendGuildCount(BotLists.BOTLIST_SPACE, guildCount)
+                    BotLists.BOTSFORDISCORD.name -> sendGuildCount(BotLists.BOTSFORDISCORD, guildCount)
+                    // BotLists.BOTS_ONDISCORD.name -> sendGuildCount(BotLists.BOTS_ONDISCORD, guildCount)
+                    BotLists.BOTS_ONDISCORD.name -> return@forEach // Not approved yet
+                    BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
+                    BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
+                    // BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
+                    BotLists.DISCORDBOT_WORLD.name -> return@forEach // Not approved yet
+                    // BotLists.BOTS_DISCORD_PW.name -> sendGuildCount(BotLists.BOTS_DISCORD_PW, guildCount, shardCount)
+                    BotLists.BOTS_DISCORD_PW.name -> return@forEach // Not approved yet
+                    BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
+                }
+            }
+        }
+
         fun sendGuildCount(list: BotLists, guildCount: Int, shardCount: Int? = null) {
             if (Sophie.config.env != "prod")
                 return
 
-            val logger = Logger.getGlobal()
-            val token = Sophie.config.tokens.lists[list.name.toLowerCase()] ?: return
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json", "Authorization" to token))
+            val name = list.name.toLowerCase()
+            catchAll("Exception occured while sending guild count to $name", null) {
+                val logger = Logger.getGlobal()
+                val token = Sophie.config.tokens.lists[name] ?: return
+                val headers = Sophie.defaultHeaders
+                headers.putAll(mapOf("Accept" to "application/json", "Authorization" to token))
 
-            val json =
-                    if (shardCount != null)
-                        "{\"server_count\": $guildCount, \"shard_count\": $shardCount}"
-                    else
-                        "{\"server_count\": $guildCount}"
-            val mediaType = MediaType.parse("application/json; charset=utf-8")
-            val requestBody = RequestBody.create(mediaType, json)
-
-            val request = Request.Builder()
-                    .headers(Headers.of(headers))
-                    .post(requestBody)
-                    .url(list.url)
-                    .build()
-
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    logger.warning(e.message ?: "Unkown exception")
+                val json = when (list) {
+                    BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
+                    BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
+                    BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
+                    else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
                 }
 
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful)
-                        logger.info("Success sending guild count")
-                    else
-                        logger.warning(response.message() ?: "Unkown exception")
-                }
-            })
+                val mediaType = MediaType.parse("application/json; charset=utf-8")
+                val requestBody = RequestBody.create(mediaType, json)
+
+                val request = Request.Builder()
+                        .headers(Headers.of(headers))
+                        .post(requestBody)
+                        .url(list.url)
+                        .build()
+
+                Sophie.httpClient.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, exception: IOException) {
+                        throw exception
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful)
+                            logger.info("Success sending guild count to $name")
+                        else
+                            throw HttpException(response.code(), response.message())
+                    }
+                })
+            }
         }
 
         fun edit(msg: Message, newContent: String) {
