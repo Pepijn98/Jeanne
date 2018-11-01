@@ -79,6 +79,10 @@ object Sophie {
     }
 }
 
+enum class BotLists(val url: String) {
+    DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats")
+}
+
 enum class ExitStatus(val code: Int) {
     // Non error
     UPDATE(10),

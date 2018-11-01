@@ -1,5 +1,6 @@
 package info.kurozeropb.sophie.utils
 
+import info.kurozeropb.sophie.BotLists
 import info.kurozeropb.sophie.PlayingGame
 import net.dv8tion.jda.core.MessageBuilder
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
@@ -15,8 +16,10 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
 import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
 import net.dv8tion.jda.webhook.WebhookClientBuilder
 import net.dv8tion.jda.webhook.WebhookMessageBuilder
+import okhttp3.*
 import java.awt.Color
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.lang.NumberFormatException
 import java.util.function.Consumer
@@ -97,6 +100,43 @@ class Utils(private val e: MessageReceivedEvent) {
         val emotePattern = Regex("<:.+?:(\\d{17,20})>")
         val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
         val nullToNull = null to null
+
+        fun sendGuildCount(list: BotLists, guildCount: Int, shardCount: Int? = null) {
+            if (Sophie.config.env != "prod")
+                return
+
+            val logger = Logger.getGlobal()
+            val token = Sophie.config.tokens.lists[list.name.toLowerCase()] ?: return
+            val headers = Sophie.defaultHeaders
+            headers.putAll(mapOf("Accept" to "application/json", "Authorization" to token))
+
+            val json =
+                    if (shardCount != null)
+                        "{\"server_count\": $guildCount, \"shard_count\": $shardCount}"
+                    else
+                        "{\"server_count\": $guildCount}"
+            val mediaType = MediaType.parse("application/json; charset=utf-8")
+            val requestBody = RequestBody.create(mediaType, json)
+
+            val request = Request.Builder()
+                    .headers(Headers.of(headers))
+                    .post(requestBody)
+                    .url(list.url)
+                    .build()
+
+            Sophie.httpClient.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    logger.warning(e.message ?: "Unkown exception")
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful)
+                        logger.info("Success sending guild count")
+                    else
+                        logger.warning(response.message() ?: "Unkown exception")
+                }
+            })
+        }
 
         fun edit(msg: Message, newContent: String) {
             if (!msg.isFromType(ChannelType.TEXT) || msg.textChannel.canTalk())
@@ -232,5 +272,37 @@ class Utils(private val e: MessageReceivedEvent) {
                     it.groups[1]?.value to it.groups[2]?.value
             }
         }
+    }
+}
+
+private fun Member.getHighestRole() = if (roles.size == 0) {
+    null
+} else roles.reduce { prev, next ->
+    if (prev != null) {
+        if (next.position > prev.position) next else prev
+    } else {
+        next
+    }
+}
+
+fun Member.isKickableBy(kicker: Member): Boolean = isBannableBy(kicker)
+
+fun Member.isBannableBy(banner: Member): Boolean {
+    if (this == banner) {
+        return false
+    }
+
+    val owner = guild.owner
+    if (this == owner) {
+        return false
+    }
+
+    val highestRoleSelf = getHighestRole()
+    val highestRoleBanner = banner.getHighestRole()
+
+    return if (highestRoleSelf == null || highestRoleBanner == null) {
+        highestRoleBanner != null
+    } else {
+        highestRoleSelf.position < highestRoleBanner.position
     }
 }

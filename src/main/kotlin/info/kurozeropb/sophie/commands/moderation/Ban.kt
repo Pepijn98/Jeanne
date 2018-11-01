@@ -2,6 +2,7 @@ package info.kurozeropb.sophie.commands.moderation
 
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.utils.isBannableBy
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
@@ -46,6 +47,13 @@ class Ban : Command(
                 }
 
                 val mentionedMember = e.message.mentionedMembers[0]
+                val isBannable = mentionedMember.isBannableBy(e.member)
+
+                if (mentionedMember == e.member)
+                    return e.reply("You can't ban yourself")
+
+                if (isBannable.not())
+                    return e.reply("I can't ban this member")
 
                 e.guild.controller
                         .ban(mentionedMember, deleteDays)

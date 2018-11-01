@@ -2,6 +2,7 @@ package info.kurozeropb.sophie.commands.moderation
 
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.utils.isKickableBy
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
@@ -32,6 +33,13 @@ class Kick : Command(
                     reason = args.subList(1, args.size).joinToString(" ")
 
                 val mentionedMember = e.message.mentionedMembers[0]
+                val isKickable = mentionedMember.isKickableBy(e.member)
+
+                if (mentionedMember == e.member)
+                    return e.reply("You can't kick yourself")
+
+                if (isKickable.not())
+                    return e.reply("I can't kick this member")
 
                 e.guild.controller
                         .kick(mentionedMember)

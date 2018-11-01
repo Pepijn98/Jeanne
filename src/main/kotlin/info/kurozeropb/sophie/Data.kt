@@ -38,7 +38,8 @@ data class Tokens(
         val error: String,
         val wolke: String,
         val imdb: String,
-        val kurozero: String
+        val kurozero: String,
+        val lists: Map<String, String>
 )
 
 data class Database(
