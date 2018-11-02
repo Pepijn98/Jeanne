@@ -19,8 +19,8 @@ class Cat : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in cat command", e.channel) {
-            val headers = Sophie.defaultHeaders
-            headers.putAll(mapOf("Accept" to "application/json"))
+            val headers = mutableMapOf("Accept" to "application/json")
+            headers.putAll(Sophie.defaultHeaders)
             val request = Request.Builder()
                     .headers(Headers.of(headers))
                     .url("https://aws.random.cat/meow")

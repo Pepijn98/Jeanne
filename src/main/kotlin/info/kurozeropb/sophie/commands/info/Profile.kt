@@ -60,63 +60,62 @@ class Profile : Command(
                         e.reply("Successfully updated your about description")
                     }
                 }
-                return
-            }
-
-            if (user == null) {
-                DatabaseManager.users.insertOne(User(e.author.id))
-                user = User(e.author.id)
-            }
-
-            val size = if (args.isNotEmpty()) args[0].toLowerCase() else "small"
-            if (size != "large" && size != "small")
-                return e.reply("Invalid size, only sizes 'large' and 'small' are allowed.")
-
-            val json = """
-                {
-                    "username": "${e.author.name}",
-                    "avatar": "${e.author.effectiveAvatarUrl}",
-                    "about": "${user.about}",
-                    "level": ${user.level},
-                    "points": ${user.points},
-                    "background": "${user.background}",
-                    "size": "$size"
-                }
-            """.trimIndent()
-
-            val mediaType = MediaType.parse("application/json; charset=utf-8")
-            val requestBody = RequestBody.create(mediaType, json)
-            val apiUrl = Sophie.config.apiUrl + "/profile"
-            val headers = mutableMapOf("authorization" to Sophie.config.tokens.kurozero)
-            headers.putAll(Sophie.defaultHeaders)
-            val request = Request.Builder()
-                    .url(apiUrl)
-                    .headers(Headers.of(headers))
-                    .post(requestBody)
-                    .build()
-
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    throw e
+            } else {
+                if (user == null) {
+                    DatabaseManager.users.insertOne(User(e.author.id))
+                    user = User(e.author.id)
                 }
 
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body == null) {
-                            response.close()
-                            return e.reply("Failed to request profile card please try again later.")
-                        }
+                val size = if (args.isNotEmpty()) args[0].toLowerCase() else "small"
+                if (size != "large" && size != "small")
+                    return e.reply("Invalid size, only sizes 'large' and 'small' are allowed.")
 
-                        e.reply(body.byteStream(), "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
-                    } else {
-                        val code = response.code()
-                        val message = response.message()
-                        response.close()
-                        throw HttpException(code, message)
+                val json = """
+                    {
+                        "username": "${e.author.name}",
+                        "avatar": "${e.author.effectiveAvatarUrl}",
+                        "about": "${user.about}",
+                        "level": ${user.level},
+                        "points": ${user.points},
+                        "background": "${user.background}",
+                        "size": "$size"
                     }
-                }
-            })
+                    """.trimIndent()
+
+                val mediaType = MediaType.parse("application/json; charset=utf-8")
+                val requestBody = RequestBody.create(mediaType, json)
+                val apiUrl = Sophie.config.apiUrl + "/profile"
+                val headers = mutableMapOf("authorization" to Sophie.config.tokens.kurozero)
+                headers.putAll(Sophie.defaultHeaders)
+                val request = Request.Builder()
+                        .url(apiUrl)
+                        .headers(Headers.of(headers))
+                        .post(requestBody)
+                        .build()
+
+                Sophie.httpClient.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        throw e
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful) {
+                            val body = response.body()
+                            if (body == null) {
+                                response.close()
+                                return e.reply("Failed to request profile card please try again later.")
+                            }
+
+                            e.reply(body.byteStream(), "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
+                        } else {
+                            val code = response.code()
+                            val message = response.message()
+                            response.close()
+                            throw HttpException(code, message)
+                        }
+                    }
+                })
+            }
         }
     }
 }

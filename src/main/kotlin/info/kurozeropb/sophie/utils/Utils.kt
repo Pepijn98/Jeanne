@@ -8,8 +8,6 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
@@ -127,11 +125,11 @@ class Utils(private val e: MessageReceivedEvent) {
                 return
 
             val name = list.name.toLowerCase()
-            catchAll("Exception occured while sending guild count to $name", null) {
+            Utils.catchAll("Exception occured while sending guild count to $name", null) {
                 val logger = Logger.getGlobal()
                 val token = Sophie.config.tokens.lists[name] ?: return
-                val headers = Sophie.defaultHeaders
-                headers.putAll(mapOf("Accept" to "application/json", "Authorization" to token))
+                val headers = mutableMapOf("Accept" to "application/json", "Authorization" to token)
+                headers.putAll(Sophie.defaultHeaders)
 
                 val json = when (list) {
                     BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
@@ -240,7 +238,7 @@ class Utils(private val e: MessageReceivedEvent) {
 
         inline fun setInterval(millis: Long, action: () -> Unit) {
             while (true) {
-                catchAll("Exception occured in interval func", null) {
+                Utils.catchAll("Exception occured in interval func", null) {
                     Thread.sleep(millis)
                     action()
                 }
