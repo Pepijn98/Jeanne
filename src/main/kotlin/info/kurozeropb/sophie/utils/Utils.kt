@@ -95,6 +95,7 @@ class Utils(private val e: MessageReceivedEvent) {
 
     companion object {
         const val ZERO_WIDTH_SPACE = "\u200E"
+        val discordIdPattern = Regex("\\d{17,20}")
         val userMentionPattern = Regex("<@!?(\\d{17,20})>")
         val channelMentionPattern = Regex("<#(\\d{17,20})>")
         val roleMentionPattern = Regex("<@&\\d{17,20}>")
@@ -272,6 +273,19 @@ class Utils(private val e: MessageReceivedEvent) {
         fun embedColor(e: GuildBanEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
         fun embedColor(e: GuildMemberNickChangeEvent): Color = e.guild.selfMember.color ?: Sophie.embedColor
+
+        suspend fun findUser(str: String, e: MessageReceivedEvent): User? {
+            if (str.isEmpty())
+                return null
+
+            val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
+            val isValidID = discordIdPattern.matches(id)
+            return if (isValidID) {
+                e.jda.getUserById(id) ?: e.jda.retrieveUserById(id).await() // .queue({ user = it }, { user = null })
+            } else {
+                e.jda.users.find { it.name == id }
+            }
+        }
 
         fun convertMember(str: String, e: MessageReceivedEvent): Member? {
             if (str.isEmpty())
