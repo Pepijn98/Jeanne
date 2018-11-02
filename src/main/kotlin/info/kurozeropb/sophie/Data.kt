@@ -35,7 +35,7 @@ data class Tokens(
         val dev: String,
         val test: String,
         val prod: String,
-        val error: String,
+        val exception_hook: String,
         val wolke: String,
         val imdb: String,
         val kurozero: String,

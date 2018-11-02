@@ -10,7 +10,6 @@ import info.kurozeropb.sophie.utils.Utils
 import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.events.ReadyEvent
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
 import org.litote.kmongo.SetTo
@@ -24,8 +23,8 @@ import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
+import net.dv8tion.jda.core.events.guild.member.*
+import org.litote.kmongo.findOne
 import java.time.temporal.ChronoUnit
 
 class EventManager : ListenerAdapter() {
@@ -55,6 +54,34 @@ class EventManager : ListenerAdapter() {
                 Utils.setInterval(1_800_000) { // Every 30 minutes
                     Utils.sendGuildCountAll(Sophie.shardManager.guilds.size, Sophie.shardManager.shardsTotal)
                 }
+            }
+        }
+    }
+
+    override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent?) {
+        if (event == null)
+            return
+
+        if (event.guild.id == "240059867744698368" && event.roles.map { it.id }.contains("464548479792971786")) {
+            val user = DatabaseManager.users.findOne(User::id eq event.user.id)
+            if (user == null) {
+                DatabaseManager.users.insertOne(User(event.user.id, donator = true))
+            } else {
+                DatabaseManager.users.updateOne(User::id eq event.user.id, set(User::donator, true))
+            }
+        }
+    }
+
+    override fun onGuildMemberRoleRemove(event: GuildMemberRoleRemoveEvent?) {
+        if (event == null)
+            return
+
+        if (event.guild.id == "240059867744698368" && event.roles.map { it.id }.contains("464548479792971786")) {
+            val user = DatabaseManager.users.findOne(User::id eq event.user.id)
+            if (user == null) {
+                DatabaseManager.users.insertOne(User(event.user.id, donator = false))
+            } else {
+                DatabaseManager.users.updateOne(User::id eq event.user.id, set(User::donator, false))
             }
         }
     }

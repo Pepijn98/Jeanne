@@ -250,7 +250,7 @@ class Utils(private val e: MessageReceivedEvent) {
             try {
                 action()
             } catch (exception: Throwable) {
-                val webhook = WebhookClientBuilder(Sophie.config.tokens.error).build()
+                val webhook = WebhookClientBuilder(Sophie.config.tokens.exception_hook).build()
                 val logger = Logger.getGlobal()
                 val errorMessage = """```diff
                             |$message:
