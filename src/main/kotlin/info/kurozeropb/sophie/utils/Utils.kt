@@ -281,7 +281,8 @@ class Utils(private val e: MessageReceivedEvent) {
             val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
             val isValidID = discordIdPattern.matches(id)
             return if (isValidID) {
-                e.jda.getUserById(id) ?: e.jda.retrieveUserById(id).await() // .queue({ user = it }, { user = null })
+                // Just to be sure we do e.jda.getUserById() ourselves too
+                e.jda.getUserById(id) ?: e.jda.retrieveUserById(id).await()
             } else {
                 e.jda.users.find { it.name == id }
             }
