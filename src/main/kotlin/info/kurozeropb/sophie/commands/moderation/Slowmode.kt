@@ -18,7 +18,7 @@ class Slowmode : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in prune command", e.channel) {
+        Utils.catchAll("Exception occured in slowmode command", e.channel) {
             if (args.isEmpty())
                 return e.reply("First argument is required, check help for more info")
 

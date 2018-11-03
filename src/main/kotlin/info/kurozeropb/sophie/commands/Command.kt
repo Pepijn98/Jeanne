@@ -23,6 +23,7 @@ abstract class Command(
         val aliases: List<String> = listOf(),
         val subCommands: List<String> = listOf(),
         val cooldown: Long = 5,
+        val isDonatorsOnly: Boolean = false,
         val allowPrivate: Boolean = true,
         val isDeveloperOnly: Boolean = false,
         val isHidden: Boolean = false,

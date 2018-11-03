@@ -14,7 +14,9 @@ class Test : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in test command", e.channel) {
-            Utils.sendGuildCountAll(7300, 7)
+            val role = e.guild.getRoleById("464548479792971786")
+            val mems = e.guild.members.filter { it.roles.contains(role) }
+            println(mems)
         }
     }
 }

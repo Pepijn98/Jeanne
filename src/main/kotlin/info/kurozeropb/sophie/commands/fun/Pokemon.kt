@@ -21,7 +21,7 @@ class Pokemon : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in 8ball command", e.channel) {
+        Utils.catchAll("Exception occured in pokemon command", e.channel) {
             if (args.isEmpty())
                 return e.reply("Which pokemon do you want to search for?")
 

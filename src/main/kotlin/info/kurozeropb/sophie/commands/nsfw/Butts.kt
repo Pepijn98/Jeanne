@@ -5,6 +5,7 @@ import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.utils.Utils
 import net.dv8tion.jda.core.Permission
+import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.*
 import java.io.IOException
@@ -20,12 +21,10 @@ class Butts : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in butts command", e.channel) {
-            if (e.textChannel.isNSFW.not()) {
+            if (e.isFromType(ChannelType.PRIVATE).not() && e.textChannel.isNSFW.not()) {
                 e.reply("This command can only be used in NSFW channels")
                 return
             }
-
-            // TODO: Donators check
 
             val headers = mutableMapOf("Accept" to "application/json")
             headers.putAll(Sophie.defaultHeaders)

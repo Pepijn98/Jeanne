@@ -163,6 +163,12 @@ class EventManager : ListenerAdapter() {
                 return
             }
 
+            if (command.isDonatorsOnly) {
+                val user = DatabaseManager.users.findOne(User::id eq e.author.id) ?: return
+                if (user.donator.not())
+                    return ctx.reply("This command can only be used by donators\nCheck out the donate command for more info")
+            }
+
             if (e.author.id != Sophie.config.developer) {
                 val cooldown = cooldowns.find { it.id == e.author.id && it.command.name == command.name }
 

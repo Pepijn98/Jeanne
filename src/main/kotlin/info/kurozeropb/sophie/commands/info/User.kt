@@ -27,7 +27,7 @@ class User : Command(
             .toFormatter()
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in guild command", e.channel) {
+        Utils.catchAll("Exception occured in user command", e.channel) {
             val member = Utils.convertMember(args.joinToString(" "), e)
                     ?: when {
                         e.message.mentionedMembers.isNotEmpty() -> e.message.mentionedMembers[0]
