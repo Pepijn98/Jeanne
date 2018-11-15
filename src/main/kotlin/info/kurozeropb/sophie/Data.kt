@@ -1,8 +1,5 @@
 package info.kurozeropb.sophie
 
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import info.kurozeropb.sophie.commands.Command
 import net.dv8tion.jda.core.entities.Game
 import java.time.OffsetDateTime
@@ -39,7 +36,7 @@ data class Tokens(
         val wolke: String,
         val imdb: String,
         val kurozero: String,
-        val lists: Map<String, String>
+        val botlists: HashMap<String, String>
 )
 
 data class Database(
@@ -85,20 +82,12 @@ data class QuestionCache(
 // https://aws.random.cat/meow
 data class CatData(
         val file: String
-) {
-    class Deserializer : ResponseDeserializable<CatData> {
-        override fun deserialize(content: String): CatData? = Gson().fromJson(content, CatData::class.java)
-    }
-}
+)
 
 // https://nekos.moe
 data class Nekos(
         val images: ArrayList<Neko>
-) {
-    class Deserializer : ResponseDeserializable<Nekos> {
-        override fun deserialize(content: String): Nekos? = Gson().fromJson(content, Nekos::class.java)
-    }
-}
+)
 
 data class Neko(
         val id: String,
@@ -127,46 +116,30 @@ data class NekoApprover(
 // http://media.obutts.ru
 // http://media.oboobs.ru
 data class ONsfwData(
-        val model: String?,
+        val model: String? = null,
         val preview: String,
         val id: Int,
         val rank: Int,
-        val author: String?
-) {
-    class Deserializer : ResponseDeserializable<ArrayList<ONsfwData>> {
-        override fun deserialize(content: String): ArrayList<ONsfwData>? = Gson().fromJson(content, object: TypeToken<ArrayList<ONsfwData>>(){}.type)
-    }
-}
+        val author: String? = null
+)
 
 // http://api.program-o.com
 data class ProgramO(
         val convo_id: String,
         val usersay: String,
         val botsay: String
-) {
-    class Deserializer : ResponseDeserializable<ProgramO> {
-        override fun deserialize(content: String): ProgramO? = Gson().fromJson(content, ProgramO::class.java)
-    }
-}
+)
 
 // http://www.omdbapi.com/
 data class OmdbTypeTest (
         val Type: String,
         val Response: String
-)  {
-    class Deserializer : ResponseDeserializable<OmdbTypeTest> {
-        override fun deserialize(content: String): OmdbTypeTest? = Gson().fromJson(content, OmdbTypeTest::class.java)
-    }
-}
+)
 
 data class OmdbError (
         val Response: String,
         val Error: String
-)  {
-    class Deserializer : ResponseDeserializable<OmdbError> {
-        override fun deserialize(content: String): OmdbError? = Gson().fromJson(content, OmdbError::class.java)
-    }
-}
+)
 
 data class OmdbMovie (
     val Title: String,
@@ -189,11 +162,7 @@ data class OmdbMovie (
     val imdbID: String,
     val Type: String,
     val Response: String
-)  {
-    class Deserializer : ResponseDeserializable<OmdbMovie> {
-        override fun deserialize(content: String): OmdbMovie? = Gson().fromJson(content, OmdbMovie::class.java)
-    }
-}
+)
 
 data class OmdbTvshow (
     val Title: String,
@@ -217,11 +186,7 @@ data class OmdbTvshow (
     val Type: String,
     val Response: String,
     val totalSeasons: String
-)  {
-    class Deserializer : ResponseDeserializable<OmdbTvshow> {
-        override fun deserialize(content: String): OmdbTvshow? = Gson().fromJson(content, OmdbTvshow::class.java)
-    }
-}
+)
 
 data class OmdbEpisode (
     val Title: String,
@@ -245,37 +210,29 @@ data class OmdbEpisode (
     val Poster: String,
     val Metascore: String,
     val Response: String
-)  {
-    class Deserializer : ResponseDeserializable<OmdbEpisode> {
-        override fun deserialize(content: String): OmdbEpisode? = Gson().fromJson(content, OmdbEpisode::class.java)
-    }
-}
+)
 
 data class PokemonData(
     val names: PokemonNames,
     val national_id: Int,
     val types: ArrayList<String>,
     val abilities: ArrayList<PokemonAbility>,
-    val gender_ratios: PokemonGenderRatio,
-    val catch_rate: String,
+    val gender_ratios: PokemonGenderRatio? = null,
+    val catch_rate: Int,
     val egg_groups: ArrayList<String>,
     val hatch_time: ArrayList<Int>,
     val height_us: String,
     val height_eu: String,
     val weight_us: String,
     val weight_eu: String,
-    val base_exp_yield: String,
+    val base_exp_yield: Int,
     val leveling_rate: String,
     val color: String,
-    val base_friendship: String,
-    val evolution_from: String,
+    val base_friendship: Int,
+    val evolution_from: String? = null,
     val categories: PokemonCategories,
     val evolutions: ArrayList<PokemonEvolution>
-) {
-    class Deserializer : ResponseDeserializable<PokemonData> {
-        override fun deserialize(content: String): PokemonData? = Gson().fromJson(content, PokemonData::class.java)
-    }
-}
+)
 
 data class PokemonNames(
         val fr: String,
@@ -286,7 +243,7 @@ data class PokemonNames(
 
 data class PokemonAbility(
         val name: String,
-        val hidden: Boolean?
+        val hidden: Boolean? = null
 )
 
 data class PokemonGenderRatio(
@@ -296,7 +253,7 @@ data class PokemonGenderRatio(
 
 data class PokemonEvolution(
         val to: String,
-        val level: Int
+        val level: Int? = null
 )
 
 data class PokemonCategories(

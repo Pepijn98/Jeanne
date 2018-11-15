@@ -1,7 +1,8 @@
 package info.kurozeropb.sophie.commands.`fun`
 
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class Test : Command(
@@ -14,9 +15,7 @@ class Test : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in test command", e.channel) {
-            val role = e.guild.getRoleById("464548479792971786")
-            val mems = e.guild.members.filter { it.roles.contains(role) }
-            println(mems)
+            throw HttpException(404, "Not Found")
         }
     }
 }

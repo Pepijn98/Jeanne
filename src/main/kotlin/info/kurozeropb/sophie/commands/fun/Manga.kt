@@ -1,9 +1,11 @@
 package info.kurozeropb.sophie.commands.`fun`
 
+import com.beust.klaxon.Klaxon
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
-import info.kurozeropb.sophie.utils.Kitsu
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
+import info.kurozeropb.sophie.core.Kitsu
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.*
@@ -20,54 +22,62 @@ class Manga : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in manga command", e.channel) {
-            val name = args.joinToString("-").toLowerCase()
-            val headers = mutableMapOf(
-                    "Content-Type" to "application/vnd.api+json",
-                    "Accept" to "application/vnd.api+json"
-            )
-            headers.putAll(Sophie.defaultHeaders)
-            val request = Request.Builder()
-                    .headers(Headers.of(headers))
-                    .url("${Kitsu.baseUrl}/manga?filter[text]=$name")
-                    .build()
+        val name = args.joinToString("-").toLowerCase()
+        val headers = mutableMapOf(
+                "Content-Type" to "application/vnd.api+json",
+                "Accept" to "application/vnd.api+json"
+        )
+        headers.putAll(Sophie.defaultHeaders)
+        val request = Request.Builder()
+                .headers(Headers.of(headers))
+                .url("${Kitsu.baseUrl}/manga?filter[text]=$name")
+                .build()
 
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, exception: IOException) {
+        Sophie.httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, exception: IOException) {
+                Utils.catchAll("Exception occured in manga command", e.channel) {
                     throw exception
                 }
+            }
 
-                override fun onResponse(call: Call, response: Response) {
+            override fun onResponse(call: Call, response: Response) {
+                Utils.catchAll("Exception occured in manga command", e.channel) {
                     val respstring = response.body()?.string()
-                    if (response.isSuccessful && respstring != null) {
-                        val manga = Kitsu.Manga.Deserializer().deserialize(respstring)
+                    val message = response.message()
+                    val code = response.code()
+                    response.close()
+
+                    if (response.isSuccessful) {
+                        if (respstring.isNullOrBlank())
+                            return e.reply("Could not find a manga with the name **$name**")
+
+                        val manga = Klaxon().parse<Kitsu.Manga>(respstring)
                         if (manga != null && manga.data.size > 0) {
                             val releaseDate =
                                     if (manga.data[0].attributes.startDate.isNullOrEmpty())
                                         "TBA"
                                     else
-                                        "${manga.data[0].attributes.startDate} until ${manga.data[0].attributes.endDate ?: "TBA"}"
+                                        "${manga.data[0].attributes.startDate} until ${manga.data[0].attributes.endDate ?: "Unkown"}"
 
                             e.reply(EmbedBuilder()
                                     .setTitle(manga.data[0].attributes.titles.en_jp)
                                     .setDescription(manga.data[0].attributes.synopsis)
                                     .setThumbnail(manga.data[0].attributes.posterImage.original)
                                     .addField("Type", manga.data[0].attributes.mangaType, true)
-                                    .addField("Chapters/Volumes", "${manga.data[0].attributes.chapterCount}/${manga.data[0].attributes.volumeCount}", true)
+                                    .addField("Chapters/Volumes", "${manga.data[0].attributes.chapterCount ?: "Unkown"}/${manga.data[0].attributes.volumeCount ?: "Unkown"}", true)
                                     .addField("Status", manga.data[0].attributes.status, true)
-                                    .addField("Rating", manga.data[0].attributes.averageRating, true)
-                                    .addField("Rank", "#" + manga.data[0].attributes.ratingRank, true)
+                                    .addField("Rating", manga.data[0].attributes.averageRating ?: "Unkown", true)
+                                    .addField("Rank", if (manga.data[0].attributes.ratingRank != null) "#${manga.data[0].attributes.ratingRank}" else "Unkown", true)
                                     .addField("Favorites", manga.data[0].attributes.favoritesCount.toString(), true)
-                                    .addField("Start/End", releaseDate, false)
-                            )
+                                    .addField("Start/End", releaseDate, false))
                         } else {
                             e.reply("Could not find a manga with the name **$name**")
                         }
                     } else {
-                        e.reply("HTTP Exception ${response.code()} ${response.message()}")
+                        throw HttpException(code, message)
                     }
                 }
-            })
-        }
+            }
+        })
     }
 }

@@ -4,7 +4,7 @@ import info.kurozeropb.sophie.commands.Registry
 import info.kurozeropb.sophie.managers.ConfigManager
 import info.kurozeropb.sophie.managers.DatabaseManager
 import info.kurozeropb.sophie.managers.EventManager
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.bot.sharding.ShardManager
 import net.dv8tion.jda.core.entities.Game
@@ -13,7 +13,7 @@ import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.github.natanbc.weeb4j.Weeb4J
-import info.kurozeropb.sophie.utils.Games
+import info.kurozeropb.sophie.core.games
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
@@ -33,7 +33,7 @@ object Sophie {
     lateinit var embedColor: Color
     lateinit var config: Config
     lateinit var httpClient: OkHttpClient
-    lateinit var defaultHeaders: MutableMap<String, String>
+    lateinit var defaultHeaders: Map<String, String>
     lateinit var weebApi: Weeb4J
 
     var isReady: Boolean = false
@@ -67,8 +67,8 @@ object Sophie {
         }
 
         GlobalScope.async {
-            Utils.setInterval(600000) {
-                val game = Games.list[Math.floor((Math.random() * Games.list.size)).toInt()]
+            Utils.setInterval(600_000) {
+                val game = games[Math.floor((Math.random() * games.size)).toInt()]
                 val name = game.name
                         .replace(Regex("%USERSIZE%"), shardManager.users.size.toString())
                         .replace(Regex("%GUILDSIZE%"), shardManager.guilds.size.toString())
@@ -85,7 +85,7 @@ enum class BotLists(val url: String) {
     BOTS_ONDISCORD("https://bots.ondiscord.xyz/bot-api/bots/237578660708745216/guilds"),
     DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
     DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
-    DISCORDBOT_WORLD("https://discordbot.world/bot/237578660708745216/stats"),
+    DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
     BOTS_DISCORD_PW("https://bots.discord.pw/api/bots/237578660708745216/stats"),
     DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
 }

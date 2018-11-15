@@ -6,7 +6,7 @@ import info.kurozeropb.sophie.Guild
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.User
 import info.kurozeropb.sophie.commands.Registry
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.events.ReadyEvent
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent
@@ -32,9 +32,9 @@ class EventManager : ListenerAdapter() {
     private val cooldowns: MutableList<Cooldown> = mutableListOf()
 
     override fun onReady(e: ReadyEvent) {
-        if (e.jda.shardInfo.shardId == Sophie.shardManager.shardsTotal - 1) {
+        if (e.jda.shardInfo.shardId == Sophie.shardManager.shardsTotal - 1) { // Wait for all shards to be ready
             val selfUser = e.jda.selfUser
-            Sophie.defaultHeaders = mutableMapOf("User-Agent" to "${selfUser.name.replace(" ", "_")}/v${Sophie.config.version} (sophiebot.info)")
+            Sophie.defaultHeaders = mapOf("User-Agent" to "${selfUser.name}/v${Sophie.config.version} (sophiebot.info)")
             Sophie.isReady = true
             Sophie.weebApi = Weeb4J.Builder()
                     .setToken(TokenType.WOLKE, Sophie.config.tokens.wolke)
@@ -163,9 +163,9 @@ class EventManager : ListenerAdapter() {
                 return
             }
 
-            if (command.isDonatorsOnly) {
-                val user = DatabaseManager.users.findOne(User::id eq e.author.id) ?: return
-                if (user.donator.not())
+            if (command.isDonatorsOnly && e.author.id != Sophie.config.developer) {
+                val user = DatabaseManager.users.findOne(User::id eq e.author.id)
+                if (user == null || user.donator.not())
                     return ctx.reply("This command can only be used by donators\nCheck out the donate command for more info")
             }
 

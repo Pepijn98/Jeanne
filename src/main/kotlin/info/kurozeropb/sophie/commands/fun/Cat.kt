@@ -1,9 +1,11 @@
 package info.kurozeropb.sophie.commands.`fun`
 
+import com.beust.klaxon.Klaxon
 import info.kurozeropb.sophie.CatData
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.*
@@ -18,54 +20,63 @@ class Cat : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in cat command", e.channel) {
-            val headers = mutableMapOf("Accept" to "application/json")
-            headers.putAll(Sophie.defaultHeaders)
-            val request = Request.Builder()
-                    .headers(Headers.of(headers))
-                    .url("https://aws.random.cat/meow")
-                    .build()
+        val headers = mutableMapOf("Accept" to "application/json")
+        headers.putAll(Sophie.defaultHeaders)
+        val request = Request.Builder()
+                .headers(Headers.of(headers))
+                .url("https://aws.random.cat/meow")
+                .build()
 
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, exception: IOException) {
+        Sophie.httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, exception: IOException) {
+                Utils.catchAll("Exception occured in cat command", e.channel) {
                     throw exception
                 }
+            }
 
-                override fun onResponse(call: Call, response: Response) {
+            override fun onResponse(call: Call, response: Response) {
+                Utils.catchAll("Exception occured in cat command", e.channel) {
+                    val message = response.message()
+                    val code = response.code()
                     val respstring = response.body()?.string()
-                    if (response.isSuccessful && respstring != null) {
-                        val cat = CatData.Deserializer().deserialize(respstring)
-                        if (cat != null) {
+                    response.close()
+
+                    if (response.isSuccessful) {
+                        if (respstring.isNullOrBlank())
+                            return e.reply("Could not find a cat picture, please try again later")
+
+                        val cat = Klaxon().parse<CatData>(respstring)
+                        if (cat != null && cat.file.isNotEmpty()) {
                             headers.replace("Accept", "application/json", "image/*")
                             val newRequest = Request.Builder()
                                     .headers(Headers.of(headers))
                                     .url(cat.file)
                                     .build()
 
-                            val resp = Sophie.httpClient.newCall(newRequest).execute()
-                            if (resp.isSuccessful) {
-                                val body = resp.body()
-                                if (body != null)
-                                    e.channel.sendFile(body.byteStream(), "random-cat.${body.contentType().toString().replace("image/", "")}").queue()
-                                else {
-                                    println("no")
-                                    e.reply("Something went wrong while trying to fetch the image")
-                                }
+                            val newResponse = Sophie.httpClient.newCall(newRequest).execute()
+                            val byteStream = newResponse.body()?.byteStream()
+                            val contentType = newResponse.body()?.contentType()
+                            val newMessage = newResponse.message()
+                            val newCode = newResponse.code()
+
+                            if (newResponse.isSuccessful) {
+                                if (byteStream != null)
+                                    e.reply(byteStream, "random-cat.${contentType.toString().replace("image/", "")}")
+                                else
+                                    e.reply("Could not find a cat picture, please try again later")
+                                response.close()
                             } else {
-                                println(Sophie.defaultHeaders)
-                                println(resp.message())
-                                println("yes")
-                                e.reply("Something went wrong while trying to fetch the image")
+                                response.close()
+                                throw HttpException(newCode, newMessage)
                             }
                         } else {
-                            e.reply("Something went wrong while deserializing the response string")
+                            e.reply("Could not find a cat picture, please try again later")
                         }
                     } else {
-                        e.reply("Something went wrong while trying to fetch a random image")
+                        throw HttpException(code, message)
                     }
-                    response.close()
                 }
-            })
-        }
+            }
+        })
     }
 }

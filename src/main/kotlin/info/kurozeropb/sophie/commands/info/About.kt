@@ -2,7 +2,7 @@ package info.kurozeropb.sophie.commands.info
 
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.JDAInfo
 import net.dv8tion.jda.core.Permission

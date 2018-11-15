@@ -1,9 +1,11 @@
 package info.kurozeropb.sophie.commands.`fun`
 
+import com.beust.klaxon.Klaxon
 import info.kurozeropb.sophie.PokemonData
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
@@ -21,26 +23,35 @@ class Pokemon : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in pokemon command", e.channel) {
-            if (args.isEmpty())
-                return e.reply("Which pokemon do you want to search for?")
+        if (args.isEmpty())
+            return e.reply("Which pokemon do you want to search for?")
 
-            val headers = mutableMapOf("Accept" to "application/json")
-            headers.putAll(Sophie.defaultHeaders)
-            val request = Request.Builder()
-                    .headers(Headers.of(headers))
-                    .url("https://raw.githubusercontent.com/jalyna/oakdex-pokedex/master/data/pokemon/${args.joinToString(" ").toLowerCase()}.json")
-                    .build()
+        val headers = mutableMapOf("Accept" to "application/json")
+        headers.putAll(Sophie.defaultHeaders)
+        val request = Request.Builder()
+                .headers(Headers.of(headers))
+                .url("https://raw.githubusercontent.com/jalyna/oakdex-pokedex/master/data/pokemon/${args.joinToString(" ").toLowerCase()}.json")
+                .build()
 
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, exception: IOException) {
+        Sophie.httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, exception: IOException) {
+                Utils.catchAll("Exception occured in pokemon command", e.channel) {
                     throw exception
                 }
+            }
 
-                override fun onResponse(call: Call, response: Response) {
+            override fun onResponse(call: Call, response: Response) {
+                Utils.catchAll("Exception occured in pokemon command", e.channel) {
                     val respstring = response.body()?.string()
-                    if (response.isSuccessful && respstring != null) {
-                        val pokemon = PokemonData.Deserializer().deserialize(respstring)
+                    val message = response.message()
+                    val code = response.code()
+                    response.close()
+
+                    if (response.isSuccessful) {
+                        if (respstring.isNullOrBlank())
+                            return e.reply("Could not find a pokemon with the name **${args.joinToString(" ")}**")
+
+                        val pokemon = Klaxon().parse<PokemonData>(respstring)
                         if (pokemon != null) {
                             e.reply(EmbedBuilder()
                                     .setTitle(pokemon.names.en)
@@ -57,27 +68,27 @@ class Pokemon : Command(
                                     """.trimIndent(), true)
                                     .addField("Types", pokemon.types.joinToString("\n"), true)
                                     .addField("Gender ratios", """
-                                        **Male:** ${pokemon.gender_ratios.male}
-                                        **Female:** ${pokemon.gender_ratios.female}
+                                        **Male:** ${pokemon.gender_ratios?.male ?: "-"}
+                                        **Female:** ${pokemon.gender_ratios?.female ?: "-"}
                                     """.trimIndent(), true)
-                                    .addField("Catch rate", pokemon.catch_rate, true)
+                                    .addField("Catch rate", pokemon.catch_rate.toString(), true)
                                     .addField("Egg groups", pokemon.egg_groups.joinToString("\n"), true)
                                     .addField("Hatch time", pokemon.hatch_time.joinToString("/"), true)
                                     .addField("Leveling rate", pokemon.leveling_rate, true)
                                     .addField("Evolutions", """
-                                        **To:** ${if (pokemon.evolutions.isNotEmpty()) pokemon.evolutions[0].to else null}
-                                        **At:** ${if (pokemon.evolutions.isNotEmpty()) pokemon.evolutions[0].level else null}
+                                        **To:** ${if (pokemon.evolutions.isNotEmpty()) pokemon.evolutions[0].to else "-"}
+                                        **At:** ${if (pokemon.evolutions.isNotEmpty()) pokemon.evolutions[0].level?.toString() ?: "-" else "-"}
                                     """.trimIndent(), true)
                                     .addField("Categories", pokemon.categories.en, true)
                                     .addField("National pokedex id", pokemon.national_id.toString(), true))
                         } else {
-                            e.reply("Something went wrong while deserializing the response string")
+                            e.reply("Could not find a pokemon with the name **${args.joinToString(" ")}**")
                         }
                     } else {
-                        e.reply("Something went wrong while fetching the pokemon data, most likely **${args.joinToString(" ")}** isn't a valid name.")
+                        throw HttpException(code, message)
                     }
                 }
-            })
-        }
+            }
+        })
     }
 }

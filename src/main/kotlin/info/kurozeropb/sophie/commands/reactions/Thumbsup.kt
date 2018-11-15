@@ -1,11 +1,11 @@
 package info.kurozeropb.sophie.commands.reactions
 
-import com.github.kittinunf.fuel.core.HttpException
+import info.kurozeropb.sophie.core.HttpException
 import com.github.natanbc.weeb4j.image.HiddenMode
 import com.github.natanbc.weeb4j.image.NsfwFilter
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.Headers
@@ -28,11 +28,13 @@ class Thumbsup : Command(
                         .url(image.url)
                         .build()
 
+                val member = if (e.message.mentionedMembers.size > 0) e.message.mentionedMembers[0] else Utils.convertMember(args.joinToString(" "), e)
+
                 val resp = Sophie.httpClient.newCall(request).execute()
                 if (resp.isSuccessful) {
                     val body = resp.body()
                     if (body != null)
-                        e.reply(body.byteStream(), "${image.id}.${image.fileType.name.toLowerCase()}")
+                        e.reply(body.byteStream(), "${image.id}.${image.fileType.name.toLowerCase()}", if (member != null) "**${e.member.effectiveName}** gives **${member.effectiveName}** a thumbsup" else null)
                     else
                         e.reply("Something went wrong while trying to fetch the image")
                 } else {

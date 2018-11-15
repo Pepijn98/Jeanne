@@ -1,6 +1,5 @@
-package info.kurozeropb.sophie.utils
+package info.kurozeropb.sophie.core
 
-import com.github.kittinunf.fuel.core.HttpException
 import info.kurozeropb.sophie.BotLists
 import info.kurozeropb.sophie.PlayingGame
 import net.dv8tion.jda.core.MessageBuilder
@@ -26,21 +25,19 @@ import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
 
-object Games {
-    val list = listOf(
-            PlayingGame("with Senpai", Game.GameType.DEFAULT),
-            PlayingGame("with my master", Game.GameType.DEFAULT),
-            PlayingGame("anime", Game.GameType.WATCHING),
-            PlayingGame("secret things", Game.GameType.WATCHING),
-            PlayingGame("with your feelings", Game.GameType.DEFAULT),
-            PlayingGame("https://sophiebot.info", Game.GameType.WATCHING),
-            PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
-            PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
-            PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
-            PlayingGame("%USERSIZE% users", Game.GameType.WATCHING),
-            PlayingGame("music", Game.GameType.LISTENING)
-    )
-}
+val games = listOf(
+        PlayingGame("with Senpai", Game.GameType.DEFAULT),
+        PlayingGame("with my master", Game.GameType.DEFAULT),
+        PlayingGame("anime", Game.GameType.WATCHING),
+        PlayingGame("secret things", Game.GameType.WATCHING),
+        PlayingGame("with your feelings", Game.GameType.DEFAULT),
+        PlayingGame("https://sophiebot.info", Game.GameType.WATCHING),
+        PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
+        PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
+        PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
+        PlayingGame("%USERSIZE% users", Game.GameType.WATCHING),
+        PlayingGame("music", Game.GameType.LISTENING)
+)
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Utils(private val e: MessageReceivedEvent) {
@@ -103,17 +100,15 @@ class Utils(private val e: MessageReceivedEvent) {
         val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
         val nullToNull = null to null
 
-        fun sendGuildCountAll(guildCount: Int, shardCount: Int) {
-            Sophie.config.tokens.lists.forEach { key, _ ->
-                when (key.toUpperCase()) {
+        fun sendGuildCountAll(guildCount: Int, shardCount: Int? = null) {
+            Sophie.config.tokens.botlists.forEach { k, _ ->
+                when (k) {
                     BotLists.BOTLIST_SPACE.name -> sendGuildCount(BotLists.BOTLIST_SPACE, guildCount)
                     BotLists.BOTSFORDISCORD.name -> sendGuildCount(BotLists.BOTSFORDISCORD, guildCount)
-                    // BotLists.BOTS_ONDISCORD.name -> sendGuildCount(BotLists.BOTS_ONDISCORD, guildCount)
-                    BotLists.BOTS_ONDISCORD.name -> return@forEach // Not approved yet
+                    BotLists.BOTS_ONDISCORD.name -> sendGuildCount(BotLists.BOTS_ONDISCORD, guildCount)
                     BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
                     BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
-                    // BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
-                    BotLists.DISCORDBOT_WORLD.name -> return@forEach // Not approved yet
+                    BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
                     // BotLists.BOTS_DISCORD_PW.name -> sendGuildCount(BotLists.BOTS_DISCORD_PW, guildCount, shardCount)
                     BotLists.BOTS_DISCORD_PW.name -> return@forEach // Not approved yet
                     BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
@@ -122,14 +117,13 @@ class Utils(private val e: MessageReceivedEvent) {
         }
 
         fun sendGuildCount(list: BotLists, guildCount: Int, shardCount: Int? = null) {
-            if (Sophie.config.env != "prod")
+            if (Sophie.config.env.startsWith("prod").not())
                 return
 
-            val name = list.name.toLowerCase()
-            Utils.catchAll("Exception occured while sending guild count to $name", null) {
+            Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
                 val logger = Logger.getGlobal()
-                val token = Sophie.config.tokens.lists[name] ?: return
-                val headers = mutableMapOf("Accept" to "application/json", "Authorization" to token)
+                val token = Sophie.config.tokens.botlists[list.name] ?: return
+                val headers = mutableMapOf("Content-Type" to "application/json", "Accept" to "application/json", "Authorization" to token)
                 headers.putAll(Sophie.defaultHeaders)
 
                 val json = when (list) {
@@ -155,7 +149,7 @@ class Utils(private val e: MessageReceivedEvent) {
 
                     override fun onResponse(call: Call, response: Response) {
                         if (response.isSuccessful) {
-                            logger.info("Success sending guild count to $name")
+                            logger.info("Success sending guild count to ${list.name}")
                             response.close()
                         } else {
                             val code = response.code()
@@ -250,21 +244,24 @@ class Utils(private val e: MessageReceivedEvent) {
             try {
                 action()
             } catch (exception: Throwable) {
-                val webhook = WebhookClientBuilder(Sophie.config.tokens.exception_hook).build()
                 val logger = Logger.getGlobal()
                 val errorMessage = """```diff
                             |$message:
                             |- ${exception.message ?: "Unkown exception"}
                             |```""".trimMargin("|")
                 channel?.sendMessage(errorMessage)?.queue()
-                val webhookMessage = WebhookMessageBuilder()
-                        .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
-                        .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
-                        .setContent(errorMessage)
-                        .build()
-                webhook.send(webhookMessage)
-                webhook.close()
                 logger.warning("$message > ${exception.message ?: "Unkown exception"}")
+
+                if (Sophie.config.env.startsWith("prod")) { // Only use webhook when in production
+                    val webhook = WebhookClientBuilder(Sophie.config.tokens.exception_hook).build()
+                    val webhookMessage = WebhookMessageBuilder()
+                            .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
+                            .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
+                            .setContent(errorMessage)
+                            .build()
+                    webhook.send(webhookMessage)
+                    webhook.close()
+                }
             }
         }
 

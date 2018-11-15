@@ -1,11 +1,11 @@
 package info.kurozeropb.sophie.commands.reactions
 
-import com.github.kittinunf.fuel.core.HttpException
+import info.kurozeropb.sophie.core.HttpException
 import com.github.natanbc.weeb4j.image.HiddenMode
 import com.github.natanbc.weeb4j.image.NsfwFilter
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.Headers

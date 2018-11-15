@@ -1,8 +1,10 @@
 package info.kurozeropb.sophie.commands.`fun`
 
+import com.beust.klaxon.Klaxon
 import info.kurozeropb.sophie.*
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
@@ -19,37 +21,48 @@ class Imdb : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-        Utils.catchAll("Exception occured in imdb command", e.channel) {
-            if (args.isEmpty())
-                return e.reply("Which movie/serie do you want to search?")
+        if (args.isEmpty())
+            return e.reply("Which movie/serie do you want to search?")
 
-            val baseUrl = "http://www.omdbapi.com/?apikey=${Sophie.config.tokens.imdb}"
-            val headers = mutableMapOf("Accept" to "application/json")
-            headers.putAll(Sophie.defaultHeaders)
-            val request = Request.Builder()
-                    .headers(Headers.of(headers))
-                    .url("$baseUrl&t=${args.joinToString(" ")}")
-                    .build()
+        val baseUrl = "http://www.omdbapi.com/?apikey=${Sophie.config.tokens.imdb}"
+        val headers = mutableMapOf("Accept" to "application/json")
+        headers.putAll(Sophie.defaultHeaders)
+        val request = Request.Builder()
+                .headers(Headers.of(headers))
+                .url("$baseUrl&t=${args.joinToString(" ")}")
+                .build()
 
-            Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, exception: IOException) {
+        Sophie.httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, exception: IOException) {
+                Utils.catchAll("Exception occured in imdb command", e.channel) {
                     throw exception
                 }
+            }
 
-                override fun onResponse(call: Call, response: Response) {
+            override fun onResponse(call: Call, response: Response) {
+                Utils.catchAll("Exception occured in imdb command", e.channel) {
+                    val parser = Klaxon()
                     val respstring = response.body()?.string()
-                    if (response.isSuccessful && respstring != null) {
-                        val omdb = OmdbTypeTest.Deserializer().deserialize(respstring)
+                    val message = response.message()
+                    val code = response.code()
+                    val exceptionMessage = "Could not find a movie, serie or episode for **${args.joinToString(" ")}**"
+                    response.close()
+
+                    if (response.isSuccessful) {
+                        if (respstring.isNullOrBlank())
+                            return e.reply(exceptionMessage)
+
+                        val omdb = parser.parse<OmdbTypeTest>(respstring)
                         if (omdb != null) {
                             if (omdb.Response == "False") {
-                                val error = OmdbError.Deserializer().deserialize(respstring)!!
-                                return e.reply(error.Error)
+                                val error = parser.parse<OmdbError>(respstring)
+                                return e.reply(error?.Error ?: exceptionMessage)
                             }
 
                             val embed = EmbedBuilder()
                             when (omdb.Type) {
                                 "movie" -> {
-                                    val movie = OmdbMovie.Deserializer().deserialize(respstring)
+                                    val movie = parser.parse<OmdbMovie>(respstring)
                                     if (movie != null) {
                                         embed.setTitle(movie.Title, "https://www.imdb.com/title/${movie.imdbID}")
                                                 .setDescription(movie.Plot)
@@ -63,11 +76,11 @@ class Imdb : Command(
                                                 .addField("Awards", movie.Awards, false)
                                                 .addField("Released", movie.Released, false)
                                     } else {
-                                        e.reply("Something went wrong while deserializing the response string")
+                                        e.reply(exceptionMessage)
                                     }
                                 }
                                 "serie" -> {
-                                    val serie = OmdbTvshow.Deserializer().deserialize(respstring)
+                                    val serie = parser.parse<OmdbTvshow>(respstring)
                                     if (serie != null) {
                                         embed.setTitle(serie.Title, "https://www.imdb.com/title/${serie.imdbID}")
                                                 .setDescription(serie.Plot)
@@ -81,11 +94,11 @@ class Imdb : Command(
                                                 .addField("Genres", serie.Type, false)
                                                 .addField("Released", serie.Released, false)
                                     } else {
-                                        e.reply("Something went wrong while deserializing the response string")
+                                        e.reply(exceptionMessage)
                                     }
                                 }
                                 "episode" -> {
-                                    val episode = OmdbEpisode.Deserializer().deserialize(respstring)
+                                    val episode = parser.parse<OmdbEpisode>(respstring)
                                     if (episode != null) {
                                         embed.setTitle(episode.Title, "https://www.imdb.com/title/${episode.imdbID}")
                                                 .setDescription(episode.Plot)
@@ -99,20 +112,18 @@ class Imdb : Command(
                                                 .addField("Genres", episode.Type, false)
                                                 .addField("Released", episode.Released, false)
                                     } else {
-                                        e.reply("Something went wrong while deserializing the response string")
+                                        e.reply(exceptionMessage)
                                     }
                                 }
-                                else -> {
-                                    e.reply("Oops looks like something when wrong while fetching the data")
-                                }
+                                else -> e.reply(exceptionMessage)
                             }
                             e.reply(embed)
                         }
                     } else {
-                        e.reply("Something went wrong while trying to fetch a random image")
+                        throw HttpException(code, message)
                     }
                 }
-            })
-        }
+            }
+        })
     }
 }

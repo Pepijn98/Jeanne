@@ -1,20 +1,12 @@
-package info.kurozeropb.sophie.utils
-
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.google.gson.Gson
+package info.kurozeropb.sophie.core
 
 // Probably worth making this into a dependency like I did for C#
 object Kitsu {
     const val baseUrl = "https://kitsu.io/api/edge"
 
-    // Anime deserialization
     data class Anime(
             val data: ArrayList<AnimeData>
-    ) {
-        class Deserializer : ResponseDeserializable<Anime> {
-            override fun deserialize(content: String): Anime? = Gson().fromJson(content, Anime::class.java)
-        }
-    }
+    )
 
     data class AnimeData(
             val id: String,
@@ -35,55 +27,55 @@ object Kitsu {
             val coverImageTopOffset: Int,
             val titles: AnimeTitles,
             val canonicalTitle: String,
-            val abbreviatedTitles: ArrayList<String>,
-            val averageRating: String,
+            val abbreviatedTitles: ArrayList<String>? = null,
+            val averageRating: String? = null,
             val ratingFrequencies: AnimeRatingFrequencies,
             val userCount: Int,
             val favoritesCount: Int,
-            val startDate: String?,
-            val endDate: String?,
+            val startDate: String? = null,
+            val endDate: String? = null,
             val popularityRank: Int,
-            val ratingRank: Int,
-            val ageRating: String,
-            val ageRatingGuide: String,
+            val ratingRank: Int? = null,
+            val ageRating: String? = null,
+            val ageRatingGuide: String? = null,
             val subtype: String,
             val status: String,
-            val tba: String,
+            val tba: String? = null,
             val posterImage: AnimePosterImage,
-            val coverImage: AnimeCoverImage,
-            val episodeCount: Int,
-            val episodeLength: Int,
-            val youtubeVideoId: String,
+            val coverImage: AnimeCoverImage? = null,
+            val episodeCount: Int? = null,
+            val episodeLength: Int? = null,
+            val youtubeVideoId: String? = null,
             val showType: String,
             val nsfw: Boolean
     )
 
     data class AnimeTitles(
-            val en: String,
+            val en: String? = null,
             val en_jp: String,
-            val ja_jp: String
+            val ja_jp: String? = null
     )
 
     data class AnimeRatingFrequencies(
-            val `2`: String,
-            val `3`: String,
-            val `4`: String,
-            val `5`: String,
-            val `6`: String,
-            val `7`: String,
-            val `8`: String,
-            val `9`: String,
-            val `10`: String,
-            val `11`: String,
-            val `12`: String,
-            val `13`: String,
-            val `14`: String,
-            val `15`: String,
-            val `16`: String,
-            val `17`: String,
-            val `18`: String,
-            val `19`: String,
-            val `20`: String
+            val `2`: String = "0",
+            val `3`: String = "0",
+            val `4`: String = "0",
+            val `5`: String = "0",
+            val `6`: String = "0",
+            val `7`: String = "0",
+            val `8`: String = "0",
+            val `9`: String = "0",
+            val `10`: String = "0",
+            val `11`: String = "0",
+            val `12`: String = "0",
+            val `13`: String = "0",
+            val `14`: String = "0",
+            val `15`: String = "0",
+            val `16`: String = "0",
+            val `17`: String = "0",
+            val `18`: String = "0",
+            val `19`: String = "0",
+            val `20`: String = "0"
     )
 
     data class AnimePosterImage(
@@ -101,14 +93,9 @@ object Kitsu {
             val original: String
     )
 
-    // Manga deserialization
     data class Manga(
             val data: ArrayList<MangaData>
-    ) {
-        class Deserializer : ResponseDeserializable<Manga> {
-            override fun deserialize(content: String): Manga? = Gson().fromJson(content, Manga::class.java)
-        }
-    }
+    )
 
     data class MangaData(
             val id: String,
@@ -129,54 +116,54 @@ object Kitsu {
             val coverImageTopOffset: Int,
             val titles: MangaTitles,
             val canonicalTitle: String,
-            val abbreviatedTitles: ArrayList<String>,
-            val averageRating: String,
+            val abbreviatedTitles: ArrayList<String>? = null,
+            val averageRating: String? = null,
             val ratingFrequencies: MangaRatingFrequencies,
             val userCount: Int,
             val favoritesCount: Int,
-            val startDate: String?,
-            val endDate: String?,
+            val startDate: String? = null,
+            val endDate: String? = null,
             val popularityRank: Int,
-            val ratingRank: Int,
-            val ageRating: String,
-            val ageRatingGuide: String,
+            val ratingRank: Int? = null,
+            val ageRating: String? = null,
+            val ageRatingGuide: String? = null,
             val subtype: String,
             val status: String,
-            val tba: String,
+            val tba: String? = null,
             val posterImage: MangaPosterImage,
-            val coverImage: MangaCoverImage,
-            val chapterCount: Int,
-            val volumeCount: Int,
+            val coverImage: MangaCoverImage? = null,
+            val chapterCount: Int? = null,
+            val volumeCount: Int? = null,
             val serialization: String,
             val mangaType: String
     )
 
     data class MangaTitles(
-            val en: String,
+            val en: String? = null,
             val en_jp: String,
-            val ja_jp: String
+            val ja_jp: String? = null
     )
 
     data class MangaRatingFrequencies(
-            val `2`: String,
-            val `3`: String,
-            val `4`: String,
-            val `5`: String,
-            val `6`: String,
-            val `7`: String,
-            val `8`: String,
-            val `9`: String,
-            val `10`: String,
-            val `11`: String,
-            val `12`: String,
-            val `13`: String,
-            val `14`: String,
-            val `15`: String,
-            val `16`: String,
-            val `17`: String,
-            val `18`: String,
-            val `19`: String,
-            val `20`: String
+            val `2`: String = "0",
+            val `3`: String = "0",
+            val `4`: String = "0",
+            val `5`: String = "0",
+            val `6`: String = "0",
+            val `7`: String = "0",
+            val `8`: String = "0",
+            val `9`: String = "0",
+            val `10`: String = "0",
+            val `11`: String = "0",
+            val `12`: String = "0",
+            val `13`: String = "0",
+            val `14`: String = "0",
+            val `15`: String = "0",
+            val `16`: String = "0",
+            val `17`: String = "0",
+            val `18`: String = "0",
+            val `19`: String = "0",
+            val `20`: String = "0"
     )
 
     data class MangaPosterImage(

@@ -3,11 +3,11 @@ package info.kurozeropb.sophie.commands.info
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.User
 import info.kurozeropb.sophie.commands.Command
+import info.kurozeropb.sophie.core.HttpException
 import info.kurozeropb.sophie.managers.DatabaseManager
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
-import com.github.kittinunf.fuel.core.HttpException
 import okhttp3.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -94,24 +94,26 @@ class Profile : Command(
                         .build()
 
                 Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        throw e
+                    override fun onFailure(call: Call, exception: IOException) {
+                        Utils.catchAll("Exception occured in profile command", e.channel) {
+                            throw exception
+                        }
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        if (response.isSuccessful) {
-                            val body = response.body()
-                            if (body == null) {
-                                response.close()
-                                return e.reply("Failed to request profile card please try again later.")
-                            }
-
-                            e.reply(body.byteStream(), "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
-                        } else {
-                            val code = response.code()
+                        Utils.catchAll("Exception occured in profile command", e.channel) {
+                            val byteStream = response.body()?.byteStream()
                             val message = response.message()
-                            response.close()
-                            throw HttpException(code, message)
+                            val code = response.code()
+
+                            if (response.isSuccessful) {
+                                if (byteStream == null)
+                                    return e.reply("Failed to request profile card please try again later.")
+
+                                e.reply(byteStream, "${e.author.name.toLowerCase().replace(" ", "_")}-profile-card-$size.png")
+                            } else {
+                                throw HttpException(code, message)
+                            }
                         }
                     }
                 })

@@ -1,8 +1,8 @@
-package info.kurozeropb.sophie.commands.info
+package info.kurozeropb.sophie.commands.owner
 
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.JDA
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
@@ -11,9 +11,10 @@ import java.text.DecimalFormat
 
 class Stats : Command(
         name = "stats",
-        category = Category.INFO,
+        category = Category.OWNER,
         description = "Shows stats about Sophie",
-        cooldown = 10,
+        isDeveloperOnly = true,
+        isHidden = true,
         botPermissions = listOf(Permission.MESSAGE_WRITE)
 ) {
 
@@ -41,8 +42,8 @@ class Stats : Command(
             sb.append("- Uptime        ->   $uptime\n")
             sb.append("- RAM Usage     ->   ${ramUsedMB}MB ($ramUsedPercent%)\n")
             sb.append("- Threads       ->   ${Thread.activeCount()}\n")
-            sb.append("- Guilds        ->   ${Sophie.shardManager.guildCache.size()}\n")
-            sb.append("- Users         ->   ${Sophie.shardManager.userCache.size()}\n")
+            sb.append("- Guilds        ->   ${Sophie.shardManager.guilds.size} | Cached: ${Sophie.shardManager.guildCache.size()}\n")
+            sb.append("- Users         ->   ${Sophie.shardManager.users.size} | Cached: ${Sophie.shardManager.userCache.size()}\n")
             sb.append("- Shards Online ->   $onlineShards/$shardCount\n")
             sb.append("- Average Ping  ->   ${averageShardLatency}ms\n")
             sb.append("```")

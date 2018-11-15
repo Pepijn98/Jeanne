@@ -1,10 +1,12 @@
 package info.kurozeropb.sophie.commands.`fun`
 
+import com.beust.klaxon.Klaxon
 import info.kurozeropb.sophie.ProgramO
 import info.kurozeropb.sophie.QuestionCache
 import info.kurozeropb.sophie.Sophie
 import info.kurozeropb.sophie.commands.Command
-import info.kurozeropb.sophie.utils.Utils
+import info.kurozeropb.sophie.core.HttpException
+import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import okhttp3.*
@@ -56,27 +58,38 @@ class Cleverbot : Command(
 
                 Sophie.httpClient.newCall(request).enqueue(object : Callback {
                     override fun onFailure(call: Call, exception: IOException) {
-                        throw exception
+                        Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                            throw exception
+                        }
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        val respstring = response.body()?.string()
-                        if (response.isSuccessful && respstring != null) {
-                            val resp = ProgramO.Deserializer().deserialize(respstring)
-                            if (resp != null) {
-                                val reply = resp.botsay
-                                        .replace("Chatmundo", e.jda.selfUser.name, true)
-                                        .replace("<br/> ", "\n", true)
-                                        .replace("<br/>", "\n", true)
-                                        .replace("Elizabeth", "${owner.name}#${owner.discriminator}", true)
-                                        .replace("elizaibeth", "${owner.name}#${owner.discriminator}", true)
+                        Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                            val respstring = response.body()?.string()
+                            val message = response.message()
+                            val code = response.code()
+                            response.close()
 
-                                e.reply("**${e.member.effectiveName}**, $reply")
+                            if (response.isSuccessful) {
+                                if (respstring.isNullOrBlank())
+                                    return e.reply("Could not find an answer, please try again later")
+
+                                val programo = Klaxon().parse<ProgramO>(respstring)
+                                if (programo != null) {
+                                    val reply = programo.botsay
+                                            .replace("Chatmundo", e.jda.selfUser.name, true)
+                                            .replace("<br/> ", "\n", true)
+                                            .replace("<br/>", "\n", true)
+                                            .replace("Elizabeth", "${owner.name}#${owner.discriminator}", true)
+                                            .replace("elizaibeth", "${owner.name}#${owner.discriminator}", true)
+
+                                    e.reply("**${e.member.effectiveName}**, $reply")
+                                } else {
+                                    e.reply("Could not find an answer, please try again later")
+                                }
                             } else {
-                                e.reply("Something went wrong while deserializing the response string")
+                                throw HttpException(code, message)
                             }
-                        } else {
-                            e.reply("Something went wrong while trying to get a response")
                         }
                     }
                 })
