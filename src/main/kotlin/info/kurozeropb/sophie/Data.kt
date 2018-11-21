@@ -57,6 +57,7 @@ data class Config(
         val prefix: String,
         val developer: String,
         val apiUrl: String,
+        val defaultColor: String,
         val tokens: Tokens,
         val database: Database,
         val proxy: Proxy
