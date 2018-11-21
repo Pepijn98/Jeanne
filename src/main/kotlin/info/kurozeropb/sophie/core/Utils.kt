@@ -100,6 +100,24 @@ class Utils(private val e: MessageReceivedEvent) {
         val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
         val nullToNull = null to null
 
+        val statusMap = mapOf(
+                "INITIALIZING" to "<:dnd:514793069766377472>",
+                "INITIALIZED" to "<:dnd:514793069766377472>",
+                "LOGGING_IN" to "<:away:514793069435027468>",
+                "CONNECTING_TO_WEBSOCKET" to "<:away:514793069435027468>",
+                "IDENTIFYING_SESSION" to "<:away:514793069435027468>",
+                "AWAITING_LOGIN_CONFIRMATION" to "<:away:514793069435027468>",
+                "LOADING_SUBSYSTEMS" to "<:away:514793069435027468>",
+                "CONNECTED" to "<:online:514793069883686952>",
+                "DISCONNECTED" to "<:offline:514793069640679434>",
+                "RECONNECT_QUEUED" to "<:offline:514793069640679434>",
+                "WAITING_TO_RECONNECT" to "<:dnd:514793069766377472>",
+                "ATTEMPTING_TO_RECONNECT" to "<:away:514793069435027468>",
+                "SHUTTING_DOWN" to "<:offline:514793069640679434>",
+                "SHUTDOWN" to "<:offline:514793069640679434>",
+                "FAILED_TO_LOGIN" to "<:offline:514793069640679434>"
+        )
+
         fun sendGuildCountAll(guildCount: Int, shardCount: Int? = null) {
             Sophie.config.tokens.botlists.forEach { k, _ ->
                 when (k) {

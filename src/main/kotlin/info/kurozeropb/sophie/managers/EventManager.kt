@@ -222,23 +222,19 @@ class EventManager : ListenerAdapter() {
     }
 
     override fun onGuildLeave(e: GuildLeaveEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?: return
 
-        if (!noEntry) {
-            DatabaseManager.guilds.findOneAndDelete(Guild::id eq e.guild.id)
-            DatabaseManager.guildPrefixes.remove(e.guild.id)
-        }
+        DatabaseManager.guilds.findOneAndDelete(Guild::id eq guild.id)
+        DatabaseManager.guildPrefixes.remove(guild.id)
     }
 
     override fun onGuildMemberJoin(e: GuildMemberJoinEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?: return
 
-        if (!noEntry && guild!!.welcomeEnabled) {
-            val channel = e.guild.getTextChannelById(guild.welcomeChannel)
+        if (guild.welcomeEnabled && guild.welcomeChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.welcomeChannel) ?: return
             if (channel.canTalk()) {
                 var message = guild.welcomeMessage
                 message = message.replace("%user%", e.user.name)
@@ -249,8 +245,8 @@ class EventManager : ListenerAdapter() {
             }
         }
 
-        if (!noEntry && guild!!.subbedEvents.contains("memberjoined")) {
-            val channel = e.guild.getTextChannelById(guild.logChannel)
+        if (guild.subbedEvents.contains("memberjoined") && guild.logChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.logChannel) ?: return
             channel.sendMessage(EmbedBuilder()
                     .setColor(Utils.embedColor(e))
                     .setTitle("Member joined")
@@ -262,75 +258,67 @@ class EventManager : ListenerAdapter() {
     }
 
     override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?: return
 
-        if (noEntry || !guild!!.subbedEvents.contains("memberleft"))
-            return
-
-        val channel = e.guild.getTextChannelById(guild.logChannel)
-        channel.sendMessage(EmbedBuilder()
-                .setColor(Utils.embedColor(e))
-                .setTitle("Member left")
-                .addField("Name", e.user.name, true)
-                .setThumbnail(e.user.effectiveAvatarUrl)
-                .setTimestamp(e.user.creationTime)
-                .build()).queue()
+        if (guild.subbedEvents.contains("memberleft") && guild.logChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.logChannel) ?: return
+            channel.sendMessage(EmbedBuilder()
+                    .setColor(Utils.embedColor(e))
+                    .setTitle("Member left")
+                    .addField("Name", e.user.name, true)
+                    .setThumbnail(e.user.effectiveAvatarUrl)
+                    .setTimestamp(e.user.creationTime)
+                    .build()).queue()
+        }
     }
 
     override fun onGuildBan(e: GuildBanEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?: return
 
-        if (noEntry || !guild!!.subbedEvents.contains("memberbanned"))
-            return
-
-        val channel = e.guild.getTextChannelById(guild.logChannel)
-        channel.sendMessage(EmbedBuilder()
-                .setColor(Utils.embedColor(e))
-                .setTitle("Member banned")
-                .addField("Name", e.user.name, true)
-                .setThumbnail(e.user.effectiveAvatarUrl)
-                .setTimestamp(e.user.creationTime)
-                .build()).queue()
+        if (guild.subbedEvents.contains("memberbanned") && guild.logChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.logChannel) ?: return
+            channel.sendMessage(EmbedBuilder()
+                    .setColor(Utils.embedColor(e))
+                    .setTitle("Member banned")
+                    .addField("Name", e.user.name, true)
+                    .setThumbnail(e.user.effectiveAvatarUrl)
+                    .setTimestamp(e.user.creationTime)
+                    .build()).queue()
+        }
     }
 
     override fun onGuildUnban(e: GuildUnbanEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?: return
 
-        if (noEntry || !guild!!.subbedEvents.contains("memberunbanned"))
-            return
-
-        val channel = e.guild.getTextChannelById(guild.logChannel)
-        channel.sendMessage(EmbedBuilder()
-                .setColor(Utils.embedColor(e))
-                .setTitle("Member unbanned")
-                .addField("Name", e.user.name, true)
-                .setThumbnail(e.user.effectiveAvatarUrl)
-                .setTimestamp(e.user.creationTime)
-                .build()).queue()
+        if (guild.subbedEvents.contains("memberunbanned") && guild.logChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.logChannel) ?: return
+            channel.sendMessage(EmbedBuilder()
+                    .setColor(Utils.embedColor(e))
+                    .setTitle("Member unbanned")
+                    .addField("Name", e.user.name, true)
+                    .setThumbnail(e.user.effectiveAvatarUrl)
+                    .setTimestamp(e.user.creationTime)
+                    .build()).queue()
+        }
     }
 
     override fun onGuildMemberNickChange(e: GuildMemberNickChangeEvent) {
-        val dbManager = DatabaseManager(e.guild)
-        val guild = dbManager.getGuildData()
-        val noEntry = guild == null
+        val db = DatabaseManager(e.guild)
+        val guild = db.getGuildData() ?:  return
 
-        if (noEntry || !guild!!.subbedEvents.contains("nicknamechanged"))
-            return
-
-        val channel = e.guild.getTextChannelById(guild.logChannel)
-        channel.sendMessage(EmbedBuilder()
-                .setColor(Utils.embedColor(e))
-                .setTitle("Nickname changed")
-                .addField("Old", e.prevNick ?: "Null", true)
-                .addField("New", e.newNick ?: "Null", true)
-                .setThumbnail(e.user.effectiveAvatarUrl)
-                .setTimestamp(e.user.creationTime)
-                .build()).queue()
+        if (guild.subbedEvents.contains("nicknamechanged") && guild.logChannel.isNotBlank()) {
+            val channel = e.guild.getTextChannelById(guild.logChannel) ?: return
+            channel.sendMessage(EmbedBuilder()
+                    .setColor(Utils.embedColor(e))
+                    .setTitle("Nickname changed")
+                    .addField("Old", e.prevNick ?: "-", true)
+                    .addField("New", e.newNick ?: "-", true)
+                    .setThumbnail(e.user.effectiveAvatarUrl)
+                    .setTimestamp(e.user.creationTime)
+                    .build()).queue()
+        }
     }
 }
