@@ -30,7 +30,7 @@ data class User(
 
 data class Tokens(
         val dev: String,
-        val test: String,
+        val beta: String,
         val prod: String,
         val exception_hook: String,
         val wolke: String,

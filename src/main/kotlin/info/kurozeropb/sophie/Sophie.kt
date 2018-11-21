@@ -21,7 +21,6 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 
 object Sophie {
-
     private val bootTime = System.currentTimeMillis()
     private val loggerLevels = mapOf(
             "org.mongodb.driver" to Level.WARN,
@@ -42,21 +41,43 @@ object Sophie {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
-        loggerLevels.forEach { key, value -> loggerContext.getLogger(key).level = value }
-        config = ConfigManager.read()
-        val token = if (config.env.startsWith("dev")) config.tokens.dev else if (config.env.startsWith("test")) "" else config.tokens.prod
-        httpClient = if (config.proxy.enabled) OkHttpClient.Builder().proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.proxy.host, config.proxy.port))).build() else OkHttpClient.Builder().build()
-        embedColor = Color.decode(config.defaultColor)
         Utils.catchAll("Exception occured in main", null) {
+            // Disable certain loggers
+            val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+            loggerLevels.forEach { key, value -> loggerContext.getLogger(key).level = value }
+
+            // Initialize the bot config
+            config = ConfigManager.read()
+
+            // Get the bot token depending on which enviorment version
+            val token = when {
+                config.env.startsWith("dev") -> config.tokens.dev
+                config.env.startsWith("beta") -> config.tokens.beta
+                else -> config.tokens.prod
+            }
+
+            // Create a default http client
+            httpClient =
+                    if (config.proxy.enabled)
+                        OkHttpClient.Builder().proxy(Proxy(Proxy.Type.SOCKS, InetSocketAddress(config.proxy.host, config.proxy.port))).build()
+                    else
+                        OkHttpClient.Builder().build()
+
+            // Default embed color to use
+            embedColor = Color.decode(config.defaultColor)
+
+            // Initialize the database
             DatabaseManager.initialize(config)
+            // Register all commands
             Registry().loadCommands()
+            // Connect to discord
             connect(token)
         }
     }
 
     private fun connect(token: String) {
         Utils.catchAll("Failed to connect to discord", null) {
+            // Login to discord
             shardManager = DefaultShardManagerBuilder()
                     .setShardsTotal(-1)
                     .setToken(token)
@@ -67,6 +88,7 @@ object Sophie {
         }
 
         GlobalScope.async {
+            // Change the playing game ever 30 minutes
             Utils.setInterval(600_000) {
                 val game = games[Math.floor((Math.random() * games.size)).toInt()]
                 val name = game.name
@@ -79,6 +101,7 @@ object Sophie {
     }
 }
 
+// All the damn bot lists to send stats to
 enum class BotLists(val url: String) {
     BOTLIST_SPACE("https://botlist.space/api/bots/237578660708745216"),
     BOTSFORDISCORD("https://botsfordiscord.com/api/bot/237578660708745216"),
