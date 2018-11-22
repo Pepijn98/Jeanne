@@ -76,7 +76,7 @@ class Cleverbot : Command(
 
                                 val programo = Klaxon().parse<ProgramO>(respstring)
                                 if (programo != null) {
-                                    val reply = programo.botsay
+                                    val reply = programo.reply
                                             .replace("Chatmundo", e.jda.selfUser.name, true)
                                             .replace("<br/> ", "\n", true)
                                             .replace("<br/>", "\n", true)

@@ -26,6 +26,8 @@ import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.*
 import org.litote.kmongo.findOne
 import java.time.temporal.ChronoUnit
+import java.util.*
+import kotlin.concurrent.schedule
 
 class EventManager : ListenerAdapter() {
 
@@ -50,8 +52,8 @@ class EventManager : ListenerAdapter() {
             ||-=========================================================
             """.trimMargin("|"))
 
-            GlobalScope.async {
-                Utils.setInterval(1_800_000) { // Every 30 minutes
+            if (Sophie.config.env.startsWith("prod")) {
+                Timer().schedule(1_800_000, 1_800_000) {
                     Utils.sendGuildCountAll(Sophie.shardManager.guilds.size, Sophie.shardManager.shardsTotal)
                 }
             }

@@ -10,6 +10,7 @@ class Test : Command(
         category = Category.FUN,
         description = "Testing command",
         allowPrivate = false,
+        isHidden = true,
         isDeveloperOnly = true
 ) {
 

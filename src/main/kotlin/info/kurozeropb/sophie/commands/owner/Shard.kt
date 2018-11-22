@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 
 class Shard : Command(
-        name = "shard",
+        name = "shards",
         category = Category.OWNER,
         description = "Shows all shard statuses",
         isDeveloperOnly = true,
@@ -30,7 +30,7 @@ class Shard : Command(
                     .setFooter("Total | Servers: ${Sophie.shardManager.guilds.size}, Users: ${Sophie.shardManager.users.size}, Avg. Ping: ${avgShardLatency}ms", null)
 
             Sophie.shardManager.shards.reversed().forEach { shard ->
-                embed.addField("Shard ${shard.shardInfo.shardId} ${Utils.statusMap[shard.status.name]}", """
+                embed.addField("Shard ${shard.shardInfo.shardId} ${Utils.statusMap[shard.status.name]} ${if (e.guild.jda.shardInfo.shardId == shard.shardInfo.shardId) "(current)" else ""}", """
                     ${shard.guilds.size} guilds
                     ${shard.users.size} users
                     ${shard.ping}ms

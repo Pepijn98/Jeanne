@@ -14,11 +14,11 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.sophie.core.games
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 object Sophie {
     private val bootTime = System.currentTimeMillis()
@@ -87,9 +87,9 @@ object Sophie {
                     .build()
         }
 
-        GlobalScope.async {
-            // Change the playing game ever 30 minutes
-            Utils.setInterval(600_000) {
+        // Updates the playing game every 10 minutes
+        Timer().schedule(600_000, 600_000) {
+            Utils.catchAll("Failed to update playing game", null) {
                 val game = games[Math.floor((Math.random() * games.size)).toInt()]
                 val name = game.name
                         .replace(Regex("%USERSIZE%"), shardManager.users.size.toString())

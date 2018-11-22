@@ -52,72 +52,29 @@ class Imdb : Command(
                         if (respstring.isNullOrBlank())
                             return e.reply(exceptionMessage)
 
-                        val omdb = parser.parse<OmdbTypeTest>(respstring)
-                        if (omdb != null) {
-                            if (omdb.Response == "False") {
+                        val omdbType = parser.parse<OmdbTypeTest>(respstring)
+                        if (omdbType != null) {
+                            if (omdbType.Response == "False") {
                                 val error = parser.parse<OmdbError>(respstring)
                                 return e.reply(error?.Error ?: exceptionMessage)
                             }
 
-                            val embed = EmbedBuilder()
-                            when (omdb.Type) {
-                                "movie" -> {
-                                    val movie = parser.parse<OmdbMovie>(respstring)
-                                    if (movie != null) {
-                                        embed.setTitle(movie.Title, "https://www.imdb.com/title/${movie.imdbID}")
-                                                .setDescription(movie.Plot)
-                                                .setThumbnail(movie.Poster)
-                                                .addField("Rated", movie.Rated, true)
-                                                .addField("Runtime", movie.Runtime, true)
-                                                .addField("Languages", movie.Language, true)
-                                                .addField("Rating", movie.imdbRating, true)
-                                                .addField("Type", movie.Type, true)
-                                                .addField("Genres", movie.Type, true)
-                                                .addField("Awards", movie.Awards, false)
-                                                .addField("Released", movie.Released, false)
-                                    } else {
-                                        e.reply(exceptionMessage)
-                                    }
-                                }
-                                "serie" -> {
-                                    val serie = parser.parse<OmdbTvshow>(respstring)
-                                    if (serie != null) {
-                                        embed.setTitle(serie.Title, "https://www.imdb.com/title/${serie.imdbID}")
-                                                .setDescription(serie.Plot)
-                                                .setThumbnail(serie.Poster)
-                                                .addField("Rated", serie.Rated, true)
-                                                .addField("Runtime", serie.Runtime, true)
-                                                .addField("Languages", serie.Language, true)
-                                                .addField("Awards", serie.Awards, true)
-                                                .addField("Rating", serie.imdbRating, true)
-                                                .addField("Type", serie.Type, true)
-                                                .addField("Genres", serie.Type, false)
-                                                .addField("Released", serie.Released, false)
-                                    } else {
-                                        e.reply(exceptionMessage)
-                                    }
-                                }
-                                "episode" -> {
-                                    val episode = parser.parse<OmdbEpisode>(respstring)
-                                    if (episode != null) {
-                                        embed.setTitle(episode.Title, "https://www.imdb.com/title/${episode.imdbID}")
-                                                .setDescription(episode.Plot)
-                                                .setThumbnail(episode.Poster)
-                                                .addField("Rated", episode.Rated, true)
-                                                .addField("Runtime", episode.Runtime, true)
-                                                .addField("Languages", episode.Language, true)
-                                                .addField("Awards", episode.Awards, true)
-                                                .addField("Rating", episode.imdbRating, true)
-                                                .addField("Type", episode.Type, true)
-                                                .addField("Genres", episode.Type, false)
-                                                .addField("Released", episode.Released, false)
-                                    } else {
-                                        e.reply(exceptionMessage)
-                                    }
-                                }
-                                else -> e.reply(exceptionMessage)
+                            val omdb = parser.parse<Omdb>(respstring)
+                            if (omdb != null) {
+                                e.reply(EmbedBuilder().setTitle(omdb.Title, "https://www.imdb.com/title/${omdb.imdbID}")
+                                        .setDescription(omdb.Plot)
+                                        .setThumbnail(omdb.Poster)
+                                        .addField("Rated", omdb.Rated, true)
+                                        .addField("Runtime", omdb.Runtime, true)
+                                        .addField("Languages", omdb.Language, true)
+                                        .addField("Rating", omdb.imdbRating, true)
+                                        .addField("Type", omdb.Type, true)
+                                        .addField("Genres", omdb.Genre, true)
+                                        .addField("Awards", omdb.Awards, false)
+                                        .addField("Released", omdb.Released, false))
+                            } else {
+                                e.reply(exceptionMessage)
                             }
-                            e.reply(embed)
                         }
                     } else {
                         throw HttpException(code, message)

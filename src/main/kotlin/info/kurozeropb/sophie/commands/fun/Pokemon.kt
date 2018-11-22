@@ -41,7 +41,7 @@ class Pokemon : Command(
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Utils.catchAll("Exception occured in pokemon command", e.channel) {
+                Utils.catchAll("Exception occured in pokemon command\nCommand args: ${args.joinToString(" ")}", e.channel) {
                     val respstring = response.body()?.string()
                     val message = response.message()
                     val code = response.code()

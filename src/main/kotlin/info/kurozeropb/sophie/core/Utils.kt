@@ -119,53 +119,54 @@ class Utils(private val e: MessageReceivedEvent) {
         )
 
         fun sendGuildCountAll(guildCount: Int, shardCount: Int? = null) {
-            Sophie.config.tokens.botlists.forEach { k, _ ->
-                when (k) {
-                    BotLists.BOTLIST_SPACE.name -> sendGuildCount(BotLists.BOTLIST_SPACE, guildCount)
-                    BotLists.BOTSFORDISCORD.name -> sendGuildCount(BotLists.BOTSFORDISCORD, guildCount)
-                    BotLists.BOTS_ONDISCORD.name -> sendGuildCount(BotLists.BOTS_ONDISCORD, guildCount)
-                    BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
-                    BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
-                    BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
-                    // BotLists.BOTS_DISCORD_PW.name -> sendGuildCount(BotLists.BOTS_DISCORD_PW, guildCount, shardCount)
-                    BotLists.BOTS_DISCORD_PW.name -> return@forEach // Not approved yet
-                    BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
+            Utils.catchAll("Exception occured in sendGuildCountAll func", null) {
+                Sophie.config.tokens.botlists.forEach { k, _ ->
+                    when (k) {
+                        BotLists.BOTLIST_SPACE.name -> sendGuildCount(BotLists.BOTLIST_SPACE, guildCount)
+                        BotLists.BOTSFORDISCORD.name -> sendGuildCount(BotLists.BOTSFORDISCORD, guildCount)
+                        BotLists.BOTS_ONDISCORD.name -> sendGuildCount(BotLists.BOTS_ONDISCORD, guildCount)
+                        BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
+                        BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
+                        BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
+                        // BotLists.BOTS_DISCORD_PW.name -> sendGuildCount(BotLists.BOTS_DISCORD_PW, guildCount, shardCount)
+                        BotLists.BOTS_DISCORD_PW.name -> return@forEach // Not approved yet
+                        BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
+                    }
                 }
             }
         }
 
         fun sendGuildCount(list: BotLists, guildCount: Int, shardCount: Int? = null) {
-            if (Sophie.config.env.startsWith("prod").not())
-                return
+            val logger = Logger.getGlobal()
+            val token = Sophie.config.tokens.botlists[list.name] ?: return
+            val headers = mutableMapOf("Content-Type" to "application/json", "Accept" to "application/json", "Authorization" to token)
+            headers.putAll(Sophie.defaultHeaders)
 
-            Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
-                val logger = Logger.getGlobal()
-                val token = Sophie.config.tokens.botlists[list.name] ?: return
-                val headers = mutableMapOf("Content-Type" to "application/json", "Accept" to "application/json", "Authorization" to token)
-                headers.putAll(Sophie.defaultHeaders)
+            val json = when (list) {
+                BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
+                BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
+                BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
+                else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
+            }
 
-                val json = when (list) {
-                    BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
-                    BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
-                    BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
-                    else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
-                }
+            val mediaType = MediaType.parse("application/json; charset=utf-8")
+            val requestBody = RequestBody.create(mediaType, json)
 
-                val mediaType = MediaType.parse("application/json; charset=utf-8")
-                val requestBody = RequestBody.create(mediaType, json)
+            val request = Request.Builder()
+                    .headers(Headers.of(headers))
+                    .post(requestBody)
+                    .url(list.url)
+                    .build()
 
-                val request = Request.Builder()
-                        .headers(Headers.of(headers))
-                        .post(requestBody)
-                        .url(list.url)
-                        .build()
-
-                Sophie.httpClient.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call, exception: IOException) {
+            Sophie.httpClient.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, exception: IOException) {
+                    Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
                         throw exception
                     }
+                }
 
-                    override fun onResponse(call: Call, response: Response) {
+                override fun onResponse(call: Call, response: Response) {
+                    Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
                         if (response.isSuccessful) {
                             logger.info("Success sending guild count to ${list.name}")
                             response.close()
@@ -176,8 +177,8 @@ class Utils(private val e: MessageReceivedEvent) {
                             throw HttpException(code, message)
                         }
                     }
-                })
-            }
+                }
+            })
         }
 
         fun edit(msg: Message, newContent: String) {
@@ -249,7 +250,9 @@ class Utils(private val e: MessageReceivedEvent) {
             return submit().await()
         }
 
-        inline fun setInterval(millis: Long, action: () -> Unit) {
+        /* Timer.schedule() is a thing now
+
+        inline fun setInterval(millis: Long, crossinline action: () -> Unit) {
             while (true) {
                 Utils.catchAll("Exception occured in interval func", null) {
                     Thread.sleep(millis)
@@ -257,29 +260,32 @@ class Utils(private val e: MessageReceivedEvent) {
                 }
             }
         }
+        */
 
         inline fun catchAll(message: String, channel: MessageChannel?, action: () -> Unit) {
             try {
                 action()
             } catch (exception: Throwable) {
+                if (exception.message == "HTTP Exception 404 Not Found")
+                    return
+
                 val logger = Logger.getGlobal()
                 val errorMessage = """```diff
-                            |$message:
-                            |- ${exception.message ?: "Unkown exception"}
+                            |$message
+                            |- ${exception.message ?: exception::class.simpleName ?: "Unkown exception"}
                             |```""".trimMargin("|")
                 channel?.sendMessage(errorMessage)?.queue()
-                logger.warning("$message > ${exception.message ?: "Unkown exception"}")
+                logger.warning("$message\n${exception.message ?: exception::class.simpleName ?: "Unkown exception"}")
 
-                if (Sophie.config.env.startsWith("prod")) { // Only use webhook when in production
-                    val webhook = WebhookClientBuilder(Sophie.config.tokens.exception_hook).build()
-                    val webhookMessage = WebhookMessageBuilder()
-                            .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
-                            .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
-                            .setContent(errorMessage)
-                            .build()
-                    webhook.send(webhookMessage)
-                    webhook.close()
-                }
+                val webhookUrl = if (Sophie.config.env.startsWith("prod")) Sophie.config.tokens.exception_hook else Sophie.config.tokens.dev_exception_hook
+                val webhook = WebhookClientBuilder(webhookUrl).build()
+                val webhookMessage = WebhookMessageBuilder()
+                        .setAvatarUrl(Sophie.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
+                        .setUsername(Sophie.shardManager.applicationInfo.jda.selfUser.name)
+                        .setContent(errorMessage)
+                        .build()
+                webhook.send(webhookMessage)
+                webhook.close()
             }
         }
 

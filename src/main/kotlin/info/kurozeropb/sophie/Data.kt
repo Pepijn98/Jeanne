@@ -1,5 +1,6 @@
 package info.kurozeropb.sophie
 
+import com.beust.klaxon.Json
 import info.kurozeropb.sophie.commands.Command
 import net.dv8tion.jda.core.entities.Game
 import java.time.OffsetDateTime
@@ -33,6 +34,7 @@ data class Tokens(
         val beta: String,
         val prod: String,
         val exception_hook: String,
+        val dev_exception_hook: String,
         val wolke: String,
         val imdb: String,
         val kurozero: String,
@@ -87,152 +89,67 @@ data class CatData(
 
 // https://nekos.moe
 data class Nekos(
-        val images: ArrayList<Neko>
+        val images: List<Neko>
 )
 
 data class Neko(
-        val id: String,
-        val originalHash: String,
-        val uploader: NekoUploader,
-        val approver: NekoApprover?,
-        val nsfw: Boolean,
-        val artist: String,
-        val tags: ArrayList<String>,
-        val comments: ArrayList<String>,
-        val createdAt: String,
-        val likes: Int,
-        val favorites: Int
-)
-
-data class NekoUploader(
-        val id: String,
-        val username: String
-)
-
-data class NekoApprover(
-        val id: String,
-        val username: String
+        val id: String
 )
 
 // http://media.obutts.ru
 // http://media.oboobs.ru
 data class ONsfwData(
-        val model: String? = null,
         val preview: String,
-        val id: Int,
-        val rank: Int,
-        val author: String? = null
+        val id: Int
 )
 
 // http://api.program-o.com
 data class ProgramO(
-        val convo_id: String,
-        val usersay: String,
-        val botsay: String
+        @Json(name = "botsay")
+        val reply: String
 )
 
 // http://www.omdbapi.com/
-data class OmdbTypeTest (
+data class OmdbTypeTest(
         val Type: String,
         val Response: String
 )
 
-data class OmdbError (
+data class OmdbError(
         val Response: String,
         val Error: String
 )
 
-data class OmdbMovie (
-    val Title: String,
-    val Year: String,
-    val Rated: String,
-    val Released: String,
-    val Runtime: String,
-    val Genre: String,
-    val Director: String,
-    val Writer: String,
-    val Actors: String,
-    val Plot: String,
-    val Language: String,
-    val Country: String,
-    val Awards: String,
-    val Poster: String,
-    val Metascore: String,
-    val imdbRating: String,
-    val imdbVotes: String,
-    val imdbID: String,
-    val Type: String,
-    val Response: String
-)
-
-data class OmdbTvshow (
-    val Title: String,
-    val Year: String,
-    val Rated: String,
-    val Released: String,
-    val Runtime: String,
-    val Genre: String,
-    val Director: String,
-    val Writer: String,
-    val Actors: String,
-    val Plot: String,
-    val Language: String,
-    val Country: String,
-    val Awards: String,
-    val Poster: String,
-    val Metascore: String,
-    val imdbRating: String,
-    val imdbVotes: String,
-    val imdbID: String,
-    val Type: String,
-    val Response: String,
-    val totalSeasons: String
-)
-
-data class OmdbEpisode (
-    val Title: String,
-    val Released: String,
-    val Episode: String,
-    val Type: String,
-    val imdbRating: String,
-    val imdbID: String,
-    val imdbVotes: String,
-    val Year: String,
-    val Rated: String,
-    val Runtime: String,
-    val Genre: String,
-    val Director: String,
-    val Writer: String,
-    val Actors: String,
-    val Plot: String,
-    val Language: String,
-    val Country: String,
-    val Awards: String,
-    val Poster: String,
-    val Metascore: String,
-    val Response: String
+data class Omdb(
+        val Title: String,
+        val Rated: String,
+        val Released: String,
+        val Runtime: String,
+        val Genre: String,
+        val Plot: String,
+        val Language: String,
+        val Awards: String,
+        val Poster: String,
+        val imdbRating: String,
+        val imdbID: String,
+        val Type: String
 )
 
 data class PokemonData(
-    val names: PokemonNames,
-    val national_id: Int,
-    val types: ArrayList<String>,
-    val abilities: ArrayList<PokemonAbility>,
-    val gender_ratios: PokemonGenderRatio? = null,
-    val catch_rate: Int,
-    val egg_groups: ArrayList<String>,
-    val hatch_time: ArrayList<Int>,
-    val height_us: String,
-    val height_eu: String,
-    val weight_us: String,
-    val weight_eu: String,
-    val base_exp_yield: Int,
-    val leveling_rate: String,
-    val color: String,
-    val base_friendship: Int,
-    val evolution_from: String? = null,
-    val categories: PokemonCategories,
-    val evolutions: ArrayList<PokemonEvolution>
+        val names: PokemonNames,
+        val national_id: Int,
+        val types: ArrayList<String>,
+        val gender_ratios: PokemonGenderRatio? = null,
+        val catch_rate: Int,
+        val egg_groups: ArrayList<String>,
+        val hatch_time: ArrayList<Int>,
+        val height_us: String,
+        val height_eu: String,
+        val weight_us: String,
+        val weight_eu: String,
+        val leveling_rate: String,
+        val categories: PokemonCategories,
+        val evolutions: ArrayList<PokemonEvolution>
 )
 
 data class PokemonNames(
@@ -242,14 +159,9 @@ data class PokemonNames(
         val en: String
 )
 
-data class PokemonAbility(
-        val name: String,
-        val hidden: Boolean? = null
-)
-
 data class PokemonGenderRatio(
-        val male: Float,
-        val female: Float
+        val male: Double? = 0.0,
+        val female: Double? = 0.0
 )
 
 data class PokemonEvolution(
