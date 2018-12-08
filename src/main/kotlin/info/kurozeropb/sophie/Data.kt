@@ -83,43 +83,22 @@ data class QuestionCache(
 
 // API Data
 // https://aws.random.cat/meow
-data class CatData(
-        val file: String
-)
+data class CatData(val file: String)
 
 // https://nekos.moe
-data class Nekos(
-        val images: List<Neko>
-)
-
-data class Neko(
-        val id: String
-)
+data class Nekos(val images: List<Neko>)
+data class Neko(val id: String)
 
 // http://media.obutts.ru
 // http://media.oboobs.ru
-data class ONsfwData(
-        val preview: String,
-        val id: Int
-)
+data class ONsfwData(val preview: String, val id: Int)
 
 // http://api.program-o.com
-data class ProgramO(
-        @Json(name = "botsay")
-        val reply: String
-)
+data class ProgramO(@Json(name = "botsay") val reply: String)
 
 // http://www.omdbapi.com/
-data class OmdbTypeTest(
-        val Type: String,
-        val Response: String
-)
-
-data class OmdbError(
-        val Response: String,
-        val Error: String
-)
-
+data class OmdbTypeTest(val Response: String)
+data class OmdbError(val Response: String, val Error: String)
 data class Omdb(
         val Title: String,
         val Rated: String,
@@ -132,9 +111,13 @@ data class Omdb(
         val Poster: String,
         val imdbRating: String,
         val imdbID: String,
-        val Type: String
+        val Type: String? = null
 )
 
+data class PokemonNames(val fr: String, val de: String, val it: String, val en: String)
+data class PokemonGenderRatio(val male: Double? = 0.0, val female: Double? = 0.0)
+data class PokemonEvolution(val to: String, val level: Int? = null)
+data class PokemonCategories(val en: String, val de: String)
 data class PokemonData(
         val names: PokemonNames,
         val national_id: Int,
@@ -150,26 +133,4 @@ data class PokemonData(
         val leveling_rate: String,
         val categories: PokemonCategories,
         val evolutions: ArrayList<PokemonEvolution>
-)
-
-data class PokemonNames(
-        val fr: String,
-        val de: String,
-        val it: String,
-        val en: String
-)
-
-data class PokemonGenderRatio(
-        val male: Double? = 0.0,
-        val female: Double? = 0.0
-)
-
-data class PokemonEvolution(
-        val to: String,
-        val level: Int? = null
-)
-
-data class PokemonCategories(
-        val en: String,
-        val de: String
 )

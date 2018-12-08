@@ -59,10 +59,11 @@ class Anime : Command(
                                     else
                                         "${anime.data[0].attributes.startDate} until ${anime.data[0].attributes.endDate ?: "Unkown"}"
 
+                            val title = anime.data[0].attributes.titles.en_jp ?: anime.data[0].attributes.titles.en ?: anime.data[0].attributes.titles.ja_jp ?: "-"
                             e.reply(EmbedBuilder()
-                                    .setTitle(anime.data[0].attributes.titles.en_jp)
+                                    .setTitle(title)
                                     .setDescription(anime.data[0].attributes.synopsis)
-                                    .setThumbnail(anime.data[0].attributes.posterImage.original)
+                                    .setThumbnail(anime.data[0].attributes.posterImage?.original)
                                     .addField("Type", anime.data[0].attributes.showType, true)
                                     .addField("Episodes", anime.data[0].attributes.episodeCount?.toString() ?: "Unkown", true)
                                     .addField("Status", anime.data[0].attributes.status, true)

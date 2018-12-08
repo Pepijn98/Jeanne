@@ -61,14 +61,16 @@ class Imdb : Command(
 
                             val omdb = parser.parse<Omdb>(respstring)
                             if (omdb != null) {
+                                val poster = if (Utils.urlPattern.matches(omdb.Poster)) omdb.Poster else null
+
                                 e.reply(EmbedBuilder().setTitle(omdb.Title, "https://www.imdb.com/title/${omdb.imdbID}")
                                         .setDescription(omdb.Plot)
-                                        .setThumbnail(omdb.Poster)
+                                        .setThumbnail(poster)
                                         .addField("Rated", omdb.Rated, true)
                                         .addField("Runtime", omdb.Runtime, true)
                                         .addField("Languages", omdb.Language, true)
                                         .addField("Rating", omdb.imdbRating, true)
-                                        .addField("Type", omdb.Type, true)
+                                        .addField("Type", omdb.Type ?: "-", true)
                                         .addField("Genres", omdb.Genre, true)
                                         .addField("Awards", omdb.Awards, false)
                                         .addField("Released", omdb.Released, false))

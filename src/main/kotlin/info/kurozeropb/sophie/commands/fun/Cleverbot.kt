@@ -48,7 +48,7 @@ class Cleverbot : Command(
             if (spamCheck) {
                 e.channel.sendTyping().queue()
 
-                val owner = e.jda.getUserById(Sophie.config.developer)
+                val owner = Sophie.shardManager.getUserById(Sophie.config.developer)
                 val headers = mutableMapOf("Accept" to "application/json")
                 headers.putAll(Sophie.defaultHeaders)
                 val request = Request.Builder()

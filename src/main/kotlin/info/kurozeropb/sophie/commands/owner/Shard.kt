@@ -1,6 +1,7 @@
 package info.kurozeropb.sophie.commands.owner
 
 import info.kurozeropb.sophie.Sophie
+import info.kurozeropb.sophie.Status
 import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
@@ -30,7 +31,7 @@ class Shard : Command(
                     .setFooter("Total | Servers: ${Sophie.shardManager.guilds.size}, Users: ${Sophie.shardManager.users.size}, Avg. Ping: ${avgShardLatency}ms", null)
 
             Sophie.shardManager.shards.reversed().forEach { shard ->
-                embed.addField("Shard ${shard.shardInfo.shardId} ${Utils.statusMap[shard.status.name]} ${if (e.guild.jda.shardInfo.shardId == shard.shardInfo.shardId) "(current)" else ""}", """
+                embed.addField("Shard ${shard.shardInfo.shardId} ${Status.valueOf(shard.status.name).emote} ${if (e.guild.jda.shardInfo.shardId == shard.shardInfo.shardId) "(current)" else ""}", """
                     ${shard.guilds.size} guilds
                     ${shard.users.size} users
                     ${shard.ping}ms

@@ -59,10 +59,11 @@ class Manga : Command(
                                     else
                                         "${manga.data[0].attributes.startDate} until ${manga.data[0].attributes.endDate ?: "Unkown"}"
 
+                            val title = manga.data[0].attributes.titles.en_jp ?: manga.data[0].attributes.titles.en ?: manga.data[0].attributes.titles.ja_jp ?: "-"
                             e.reply(EmbedBuilder()
-                                    .setTitle(manga.data[0].attributes.titles.en_jp)
+                                    .setTitle(title)
                                     .setDescription(manga.data[0].attributes.synopsis)
-                                    .setThumbnail(manga.data[0].attributes.posterImage.original)
+                                    .setThumbnail(manga.data[0].attributes.posterImage?.original)
                                     .addField("Type", manga.data[0].attributes.mangaType, true)
                                     .addField("Chapters/Volumes", "${manga.data[0].attributes.chapterCount ?: "Unkown"}/${manga.data[0].attributes.volumeCount ?: "Unkown"}", true)
                                     .addField("Status", manga.data[0].attributes.status, true)

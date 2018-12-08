@@ -98,25 +98,8 @@ class Utils(private val e: MessageReceivedEvent) {
         val roleMentionPattern = Regex("<@&\\d{17,20}>")
         val emotePattern = Regex("<:.+?:(\\d{17,20})>")
         val userDiscrimPattern = Regex("(.{1,32})#(\\d{4})")
+        val urlPattern = Regex("\\s*(https?|attachment)://\\S+\\s*", RegexOption.IGNORE_CASE)
         val nullToNull = null to null
-
-        val statusMap = mapOf(
-                "INITIALIZING" to "<:dnd:514793069766377472>",
-                "INITIALIZED" to "<:dnd:514793069766377472>",
-                "LOGGING_IN" to "<:away:514793069435027468>",
-                "CONNECTING_TO_WEBSOCKET" to "<:away:514793069435027468>",
-                "IDENTIFYING_SESSION" to "<:away:514793069435027468>",
-                "AWAITING_LOGIN_CONFIRMATION" to "<:away:514793069435027468>",
-                "LOADING_SUBSYSTEMS" to "<:away:514793069435027468>",
-                "CONNECTED" to "<:online:514793069883686952>",
-                "DISCONNECTED" to "<:offline:514793069640679434>",
-                "RECONNECT_QUEUED" to "<:offline:514793069640679434>",
-                "WAITING_TO_RECONNECT" to "<:dnd:514793069766377472>",
-                "ATTEMPTING_TO_RECONNECT" to "<:away:514793069435027468>",
-                "SHUTTING_DOWN" to "<:offline:514793069640679434>",
-                "SHUTDOWN" to "<:offline:514793069640679434>",
-                "FAILED_TO_LOGIN" to "<:offline:514793069640679434>"
-        )
 
         fun sendGuildCountAll(guildCount: Int, shardCount: Int? = null) {
             Utils.catchAll("Exception occured in sendGuildCountAll func", null) {
@@ -128,8 +111,7 @@ class Utils(private val e: MessageReceivedEvent) {
                         BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
                         BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
                         BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
-                        // BotLists.BOTS_DISCORD_PW.name -> sendGuildCount(BotLists.BOTS_DISCORD_PW, guildCount, shardCount)
-                        BotLists.BOTS_DISCORD_PW.name -> return@forEach // Not approved yet
+                        BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
                         BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
                     }
                 }
@@ -145,6 +127,7 @@ class Utils(private val e: MessageReceivedEvent) {
             val json = when (list) {
                 BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
                 BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
+                BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
                 BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
                 else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
             }
@@ -250,32 +233,22 @@ class Utils(private val e: MessageReceivedEvent) {
             return submit().await()
         }
 
-        /* Timer.schedule() is a thing now
-
-        inline fun setInterval(millis: Long, crossinline action: () -> Unit) {
-            while (true) {
-                Utils.catchAll("Exception occured in interval func", null) {
-                    Thread.sleep(millis)
-                    action()
-                }
-            }
-        }
-        */
-
         inline fun catchAll(message: String, channel: MessageChannel?, action: () -> Unit) {
             try {
                 action()
             } catch (exception: Throwable) {
-                if (exception.message == "HTTP Exception 404 Not Found")
+                if (exception is HttpException) {
+                    channel?.sendMessage("```diff\n- ${exception.message ?: "HTTP Exception Unkown"}```")?.queue()
                     return
+                }
 
-                val logger = Logger.getGlobal()
-                val errorMessage = """```diff
-                            |$message
-                            |- ${exception.message ?: exception::class.simpleName ?: "Unkown exception"}
-                            |```""".trimMargin("|")
+                val errorMessage = "```diff\n$message\n- ${exception.message ?: exception::class.simpleName ?: "Unkown exception"}```"
                 channel?.sendMessage(errorMessage)?.queue()
-                logger.warning("$message\n${exception.message ?: exception::class.simpleName ?: "Unkown exception"}")
+
+                if (exception.message == "timeout") {
+                    channel?.sendMessage("Something went wrong, please try again later.")?.queue()
+                    return
+                }
 
                 val webhookUrl = if (Sophie.config.env.startsWith("prod")) Sophie.config.tokens.exception_hook else Sophie.config.tokens.dev_exception_hook
                 val webhook = WebhookClientBuilder(webhookUrl).build()

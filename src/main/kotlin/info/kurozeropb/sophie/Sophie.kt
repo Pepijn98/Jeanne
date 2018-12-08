@@ -14,6 +14,8 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.sophie.core.games
+import okhttp3.Interceptor
+import okhttp3.Request
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -109,7 +111,7 @@ enum class BotLists(val url: String) {
     DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
     DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
     DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
-    BOTS_DISCORD_PW("https://bots.discord.pw/api/bots/237578660708745216/stats"),
+    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats"),
     DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
 }
 
@@ -124,4 +126,22 @@ enum class ExitStatus(val code: Int) {
     INVALID_TOKEN(20),
     CONFIG_MISSING(21),
     DUPLICATE_COMMAND_NAME(22)
+}
+
+enum class Status(val emote: String) {
+    INITIALIZING("<:dnd:514793069766377472>"),
+    INITIALIZED("<:dnd:514793069766377472>"),
+    LOGGING_IN("<:away:514793069435027468>"),
+    CONNECTING_TO_WEBSOCKET("<:away:514793069435027468>"),
+    IDENTIFYING_SESSION("<:away:514793069435027468>"),
+    AWAITING_LOGIN_CONFIRMATION("<:away:514793069435027468>"),
+    LOADING_SUBSYSTEMS("<:away:514793069435027468>"),
+    CONNECTED("<:online:514793069883686952>"),
+    DISCONNECTED("<:offline:514793069640679434>"),
+    RECONNECT_QUEUED("<:offline:514793069640679434>"),
+    WAITING_TO_RECONNECT("<:dnd:514793069766377472>"),
+    ATTEMPTING_TO_RECONNECT("<:away:514793069435027468>"),
+    SHUTTING_DOWN("<:offline:514793069640679434>"),
+    SHUTDOWN("<:offline:514793069640679434>"),
+    FAILED_TO_LOGIN("<:offline:514793069640679434>")
 }
