@@ -2,9 +2,7 @@ package info.kurozeropb.sophie.managers
 
 import com.github.natanbc.weeb4j.TokenType
 import com.github.natanbc.weeb4j.Weeb4J
-import info.kurozeropb.sophie.Guild
-import info.kurozeropb.sophie.Sophie
-import info.kurozeropb.sophie.User
+import info.kurozeropb.sophie.*
 import info.kurozeropb.sophie.commands.Registry
 import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.entities.ChannelType
@@ -12,19 +10,15 @@ import net.dv8tion.jda.core.events.ReadyEvent
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.hooks.ListenerAdapter
-import org.litote.kmongo.SetTo
-import org.litote.kmongo.eq
-import org.litote.kmongo.set
 import kotlin.math.floor
 import kotlin.math.sqrt
-import info.kurozeropb.sophie.Cooldown
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.*
-import org.litote.kmongo.findOne
+import org.litote.kmongo.*
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.concurrent.schedule
@@ -37,7 +31,6 @@ class EventManager : ListenerAdapter() {
         if (e.jda.shardInfo.shardId == Sophie.shardManager.shardsTotal - 1) { // Wait for all shards to be ready
             val selfUser = e.jda.selfUser
             Sophie.defaultHeaders = mapOf("User-Agent" to "${selfUser.name}/v${Sophie.config.version} (sophiebot.info)")
-            Sophie.isReady = true
             Sophie.weebApi = Weeb4J.Builder()
                     .setToken(TokenType.WOLKE, Sophie.config.tokens.wolke)
                     .setBotId(selfUser.idLong)
@@ -51,6 +44,10 @@ class EventManager : ListenerAdapter() {
             || Default prefix: ${Sophie.config.prefix}
             ||-=========================================================
             """.trimMargin("|"))
+
+            Utils.updateCommandDatabase()
+
+            Sophie.isReady = true
 
             if (Sophie.config.env.startsWith("prod")) {
                 Timer().schedule(1_800_000, 1_800_000) {

@@ -3,6 +3,7 @@ package info.kurozeropb.sophie.managers
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
+import info.kurozeropb.sophie.CommandData
 import info.kurozeropb.sophie.Config
 import info.kurozeropb.sophie.User as dbUser
 import info.kurozeropb.sophie.Guild as dbGuild
@@ -23,6 +24,7 @@ class DatabaseManager(guild: Guild) {
         private lateinit var db: MongoDatabase
         lateinit var guilds: MongoCollection<dbGuild>
         lateinit var users: MongoCollection<dbUser>
+        lateinit var dbCommands: MongoCollection<CommandData>
         var guildPrefixes = mutableMapOf<String, String>()
         var usersData = mutableMapOf<String, MutableMap<String, Double>>()
 
@@ -33,6 +35,7 @@ class DatabaseManager(guild: Guild) {
                 db = client.getDatabase(config.database.name)
                 guilds = db.getCollection<dbGuild>("guilds")
                 users = db.getCollection<dbUser>("users")
+                dbCommands = db.getCollection<CommandData>("commands")
                 val allGuilds = guilds.find("{}")
                 val allUsers = users.find("{}")
                 allGuilds.forEach { guildPrefixes[it.id] = it.prefix }

@@ -22,6 +22,13 @@ import java.net.Proxy
 import java.util.Timer
 import kotlin.concurrent.schedule
 
+const val ESC = "\u001B"
+const val NORMAL = ESC + "[0"
+const val BOLD   = ESC + "[1"
+const val BLINK  = ESC + "[5"      // not working on my machine
+const val BLACK  = ESC + "[0;40m"  // black background
+const val WHITE  = ESC + "[0;37m"  // normal white foreground
+
 object Sophie {
     private val bootTime = System.currentTimeMillis()
     private val loggerLevels = mapOf(

@@ -1,5 +1,6 @@
 package info.kurozeropb.sophie.commands
 
+import info.kurozeropb.sophie.CommandData
 import info.kurozeropb.sophie.ExitStatus
 import info.kurozeropb.sophie.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
@@ -79,4 +80,7 @@ abstract class Command(
 
     fun MessageReceivedEvent.reply(bytes: ByteArray, fileName: String, message: String? = null, success: Consumer<Message>? = null)
             = Utils(this).reply(bytes, fileName, message, success)
+
+    fun asData(): CommandData
+            = CommandData(name = this.name, category = this.category, description = this.description, usage = this.usage, aliases = this.aliases, subCommands = this.subCommands, cooldown = this.cooldown, isDonatorsOnly = this.isDonatorsOnly, allowPrivate = this.allowPrivate, isDeveloperOnly = this.isDeveloperOnly, isHidden = this.isHidden, userPermissions = this.userPermissions, botPermissions = this.botPermissions)
 }

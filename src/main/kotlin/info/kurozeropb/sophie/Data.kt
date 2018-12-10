@@ -2,6 +2,7 @@ package info.kurozeropb.sophie
 
 import com.beust.klaxon.Json
 import info.kurozeropb.sophie.commands.Command
+import net.dv8tion.jda.core.Permission
 import net.dv8tion.jda.core.entities.Game
 import java.time.OffsetDateTime
 
@@ -133,4 +134,20 @@ data class PokemonData(
         val leveling_rate: String,
         val categories: PokemonCategories,
         val evolutions: ArrayList<PokemonEvolution>
+)
+
+data class CommandData(
+        val name: String,
+        val category: Command.Category,
+        val description: String,
+        val usage: String? = null,
+        val aliases: List<String> = listOf(),
+        val subCommands: List<String> = listOf(),
+        val cooldown: Long = 5,
+        val isDonatorsOnly: Boolean = false,
+        val allowPrivate: Boolean = true,
+        val isDeveloperOnly: Boolean = false,
+        val isHidden: Boolean = false,
+        val userPermissions: List<Permission> = listOf(),
+        val botPermissions: List<Permission> = listOf()
 )

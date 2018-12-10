@@ -1,12 +1,17 @@
 package info.kurozeropb.sophie.core
 
+import com.github.ajalt.mordant.TermColors
 import info.kurozeropb.sophie.BotLists
+import info.kurozeropb.sophie.CommandData
 import info.kurozeropb.sophie.PlayingGame
 import net.dv8tion.jda.core.MessageBuilder
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
+import info.kurozeropb.sophie.commands.Command
+import info.kurozeropb.sophie.commands.Registry
+import info.kurozeropb.sophie.managers.DatabaseManager
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.entities.*
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
@@ -17,6 +22,9 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
 import net.dv8tion.jda.webhook.WebhookClientBuilder
 import net.dv8tion.jda.webhook.WebhookMessageBuilder
 import okhttp3.*
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.updateOne
 import java.awt.Color
 import java.io.File
 import java.io.IOException
@@ -24,6 +32,7 @@ import java.io.InputStream
 import java.lang.NumberFormatException
 import java.util.function.Consumer
 import java.util.logging.Logger
+import kotlin.system.measureTimeMillis
 
 val games = listOf(
         PlayingGame("with Senpai", Game.GameType.DEFAULT),
@@ -309,6 +318,25 @@ class Utils(private val e: MessageReceivedEvent) {
                 else
                     it.groups[1]?.value to it.groups[2]?.value
             }
+        }
+
+        fun updateCommandDatabase() {
+            println("Updating commands in database... ")
+            val milli = measureTimeMillis {
+                Registry.commands.forEach {
+                    val command = DatabaseManager.dbCommands.findOne(CommandData::name eq it.name)
+                    val commandData = it.asData()
+                    if (command == null) {
+                        DatabaseManager.dbCommands.insertOne(commandData)
+                        with(TermColors(TermColors.Level.TRUECOLOR)) {
+                            println("Inserted new command ${bold(rgb("#00b5d9")(commandData.name))} into the database")
+                        }
+                    } else {
+                        DatabaseManager.dbCommands.updateOne(CommandData::name eq it.name, commandData)
+                    }
+                }
+            }
+            println("Updating commands done! (${milli}ms) ")
         }
     }
 }
