@@ -324,15 +324,15 @@ class Utils(private val e: MessageReceivedEvent) {
             println("Updating commands in database... ")
             val milli = measureTimeMillis {
                 Registry.commands.forEach {
-                    val command = DatabaseManager.dbCommands.findOne(CommandData::name eq it.name)
+                    val command = DatabaseManager.commands.findOne(CommandData::name eq it.name)
                     val commandData = it.asData()
                     if (command == null) {
-                        DatabaseManager.dbCommands.insertOne(commandData)
+                        DatabaseManager.commands.insertOne(commandData)
                         with(TermColors(TermColors.Level.TRUECOLOR)) {
                             println("Inserted new command ${bold(rgb("#00b5d9")(commandData.name))} into the database")
                         }
                     } else {
-                        DatabaseManager.dbCommands.updateOne(CommandData::name eq it.name, commandData)
+                        DatabaseManager.commands.updateOne(CommandData::name eq it.name, commandData)
                     }
                 }
             }

@@ -16,6 +16,7 @@ class Butts : Command(
         name = "butts",
         aliases = listOf("ass", "butt"),
         category = Category.NSFW,
+        nsfw = true,
         description = "Sends a random butt pic",
         cooldown = 10,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)

@@ -20,6 +20,8 @@ abstract class Command(
         val name: String,
         val category: Category,
         val description: String,
+        val example: String? = null,
+        val nsfw: Boolean = false,
         val usage: String? = null,
         val aliases: List<String> = listOf(),
         val subCommands: List<String> = listOf(),

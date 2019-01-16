@@ -15,6 +15,7 @@ class Boobs : Command(
         name = "boobs",
         aliases = listOf("tits"),
         category = Category.NSFW,
+        nsfw = true,
         description = "Sends a random boobs pic",
         cooldown = 10,
         isDonatorsOnly = true,

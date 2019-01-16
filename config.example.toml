@@ -11,7 +11,18 @@ apiUrl = "" # kurozeropb.info api url
     error = "" # Webhook url for error handeling
     wolke = ""
     imdb = "" # Api key from omdb
+    steam = "" # Steam api key
     kurozero = "" # Api auth token
+
+    [tokens.botlists] # All the bot listing api keys
+        BOTLIST_SPACE = ""
+        BOTSFORDISCORD  = ""
+        BOTS_ONDISCORD = ""
+        DISCORDBOATS = ""
+        DISCORDBOTS_ORG = ""
+        DISCORDBOT_WORLD = ""
+        DISCORD_BOTS_GG = ""
+        DISCORDBOTS_GROUP = ""
 
 [database]
     host = "" # MongoDB host
