@@ -73,7 +73,7 @@ class Profile : Command(
                 val json = """
                     {
                         "username": "${e.author.name}",
-                        "avatar": "${e.author.effectiveAvatarUrl}",
+                        "avatar": "${e.author.effectiveAvatarUrl}?size=2048",
                         "about": "${user.about}",
                         "level": ${user.level},
                         "points": ${user.points},

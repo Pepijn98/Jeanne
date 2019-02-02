@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import net.dv8tion.jda.core.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.sophie.Sophie
-import info.kurozeropb.sophie.commands.Command
 import info.kurozeropb.sophie.commands.Registry
 import info.kurozeropb.sophie.managers.DatabaseManager
 import net.dv8tion.jda.core.EmbedBuilder
