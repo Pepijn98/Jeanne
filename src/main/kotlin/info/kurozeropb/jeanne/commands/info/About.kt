@@ -24,7 +24,7 @@ class About : Command(
                     .addField("Developer", dev?.asMention ?: "<@!${Jeanne.config.developer}>", false)
                     .addField("Language", "Kotlin v${KotlinVersion.CURRENT}", true)
                     .addField("Library", "JDA ${JDAInfo.VERSION}", true)
-                    .addField("Website", "https://kurozeropb.info/jeanne", true)
+                    .addField("Website", "https://jeannebot.info", true)
                     .addField("Support Server", "https://discord.gg/p895czC", true)
             )
         }

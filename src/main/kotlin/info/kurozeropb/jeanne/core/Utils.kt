@@ -50,7 +50,7 @@ val games = listOf(
 @Suppress("MemberVisibilityCanBePrivate")
 class Utils(private val e: MessageReceivedEvent) {
 
-    fun embedColor(): Color = e.guild.selfMember.color ?: Jeanne.embedColor
+    fun embedColor(): Color = e.guild?.selfMember?.color ?: Jeanne.embedColor
 
     fun reply(msg: Message, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
