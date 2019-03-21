@@ -17,7 +17,7 @@ import info.kurozeropb.jeanne.core.games
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
-import java.util.Timer
+import java.util.*
 import kotlin.concurrent.schedule
 
 object Jeanne {
@@ -81,7 +81,7 @@ object Jeanne {
             shardManager = DefaultShardManagerBuilder()
                     .setShardsTotal(-1)
                     .setToken(token)
-                    .setGame(Game.playing("https://kurozeropb.info/jeanne"))
+                    .setGame(Game.playing("https://jeannebot.info/"))
                     .setBulkDeleteSplittingEnabled(false)
                     .addEventListeners(EventManager())
                     .build()

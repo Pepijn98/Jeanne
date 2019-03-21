@@ -39,7 +39,7 @@ val games = listOf(
         PlayingGame("anime", Game.GameType.WATCHING),
         PlayingGame("secret things", Game.GameType.WATCHING),
         PlayingGame("with your feelings", Game.GameType.DEFAULT),
-        PlayingGame("https://kurozeropb.info/jeanne", Game.GameType.WATCHING),
+        PlayingGame("https://jeannebot.info", Game.GameType.WATCHING),
         PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
         PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
         PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
@@ -258,6 +258,10 @@ class Utils(private val e: MessageReceivedEvent) {
                     return
                 }
 
+                if (message.contains("eval command")) {
+                    return
+                }
+
                 val webhookUrl = if (Jeanne.config.env.startsWith("prod")) Jeanne.config.tokens.exception_hook else Jeanne.config.tokens.dev_exception_hook
                 val webhook = WebhookClientBuilder(webhookUrl).build()
                 val webhookMessage = WebhookMessageBuilder()
@@ -276,17 +280,19 @@ class Utils(private val e: MessageReceivedEvent) {
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildMemberNickChangeEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
 
-        suspend fun findUser(str: String, e: MessageReceivedEvent): User? {
+        suspend fun findUser(str: String, e: MessageReceivedEvent? = null): User? {
             if (str.isEmpty())
                 return null
+
+            val jda = e?.jda ?: Jeanne.shardManager.applicationInfo.jda
 
             val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
             val isValidID = discordIdPattern.matches(id)
             return if (isValidID) {
                 // Just to be sure we do e.jda.getUserById() ourselves too
-                e.jda.getUserById(id) ?: e.jda.retrieveUserById(id).await()
+                jda.getUserById(id) ?: jda.retrieveUserById(id).await()
             } else {
-                e.jda.users.find { it.name == id }
+                jda.users.find { it.name == id }
             }
         }
 

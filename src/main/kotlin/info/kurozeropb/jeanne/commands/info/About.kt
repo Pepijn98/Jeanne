@@ -17,11 +17,11 @@ class About : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in about command", e.channel) {
-            val dev = e.jda.users.find { it.id == Jeanne.config.developer }
+            val dev = e.jda.getUserById(Jeanne.config.developer)
             e.reply(EmbedBuilder()
                     .setTitle("${e.jda.selfUser.name} v${Jeanne.config.version}")
                     .setThumbnail(e.jda.selfUser.effectiveAvatarUrl)
-                    .addField("Developer", dev?.asMention ?: "<@${Jeanne.config.developer}>", false)
+                    .addField("Developer", dev?.asMention ?: "<@!${Jeanne.config.developer}>", false)
                     .addField("Language", "Kotlin v${KotlinVersion.CURRENT}", true)
                     .addField("Library", "JDA ${JDAInfo.VERSION}", true)
                     .addField("Website", "https://kurozeropb.info/jeanne", true)

@@ -19,6 +19,7 @@ class Butts : Command(
         nsfw = true,
         description = "Sends a random butt pic",
         cooldown = 10,
+        isDonatorsOnly = true,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)
 ) {
 

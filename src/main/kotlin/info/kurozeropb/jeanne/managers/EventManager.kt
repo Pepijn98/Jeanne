@@ -21,6 +21,7 @@ import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.*
+import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent
 import org.litote.kmongo.*
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -33,7 +34,7 @@ class EventManager : ListenerAdapter() {
     override fun onReady(e: ReadyEvent) {
         if (e.jda.shardInfo.shardId == Jeanne.shardManager.shardsTotal - 1) { // Wait for all shards to be ready
             val selfUser = e.jda.selfUser
-            Jeanne.defaultHeaders = mapOf("User-Agent" to "${selfUser.name}/v${Jeanne.config.version} (kurozeropb.info/jeanne)")
+            Jeanne.defaultHeaders = mapOf("User-Agent" to "${selfUser.name}/v${Jeanne.config.version} (jeannebot.info)")
             Jeanne.weebApi = Weeb4J.Builder()
                     .setToken(TokenType.WOLKE, Jeanne.config.tokens.wolke)
                     .setBotId(selfUser.idLong)
@@ -219,6 +220,16 @@ class EventManager : ListenerAdapter() {
 
             GlobalScope.async {
                 command.execute(args, e)
+            }
+        }
+    }
+
+    override fun onUserUpdateName(event: UserUpdateNameEvent?) {
+        if (event != null) {
+            val newName = event.newName
+            if (newName.startsWith("Deleted User", true)) {
+                val userID = event.entity.id
+                DatabaseManager.users.findOneAndDelete(User::id eq userID)
             }
         }
     }

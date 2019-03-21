@@ -12,6 +12,7 @@ class Shard : Command(
         name = "shards",
         category = Category.OWNER,
         description = "Shows all shard statuses",
+        allowPrivate = false,
         isDeveloperOnly = true,
         isHidden = true,
         botPermissions = listOf(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)

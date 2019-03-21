@@ -14,6 +14,7 @@ class Help : Command(
         category = Category.INFO,
         cooldown = 2,
         description = "Shows this help message",
+        allowPrivate = false,
         usage = "[<\"cmd/command\"|\"ctg/category\"> <command_name|category_name: string>]",
         subCommands = listOf("command", "cmd", "category", "ctg"),
         botPermissions = listOf(Permission.MESSAGE_WRITE)
