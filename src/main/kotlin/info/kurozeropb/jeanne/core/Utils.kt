@@ -368,7 +368,7 @@ fun Member.isBannableBy(banner: Member): Boolean {
         return false
     }
 
-    val highestRoleSelf = getHighestRole()
+    val highestRoleSelf = this.getHighestRole()
     val highestRoleBanner = banner.getHighestRole()
 
     return if (highestRoleSelf == null || highestRoleBanner == null) {
