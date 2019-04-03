@@ -1,5 +1,6 @@
 package info.kurozeropb.jeanne.managers
 
+import com.beust.klaxon.Klaxon
 import com.github.natanbc.weeb4j.TokenType
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.jeanne.*
@@ -7,6 +8,7 @@ import info.kurozeropb.jeanne.commands.Registry
 import info.kurozeropb.jeanne.Cooldown
 import info.kurozeropb.jeanne.Guild
 import info.kurozeropb.jeanne.User
+import info.kurozeropb.jeanne.core.HttpException
 import info.kurozeropb.jeanne.core.Utils
 import net.dv8tion.jda.core.entities.ChannelType
 import net.dv8tion.jda.core.events.ReadyEvent
@@ -22,7 +24,9 @@ import net.dv8tion.jda.core.events.guild.GuildBanEvent
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.core.events.guild.member.*
 import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent
+import okhttp3.*
 import org.litote.kmongo.*
+import java.io.IOException
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.concurrent.schedule
@@ -30,6 +34,20 @@ import kotlin.concurrent.schedule
 class EventManager : ListenerAdapter() {
 
     private val cooldowns: MutableList<Cooldown> = mutableListOf()
+    private val questionCache: ArrayList<QuestionCache> = arrayListOf()
+    private fun spamCheck(userId: String, question: String): Boolean {
+        val value = questionCache.find { it.id == userId }
+
+        if (value == null) {
+            questionCache.add(QuestionCache(userId, question))
+            return true
+        }
+        if (value.question == question)
+            return false
+
+        value.question = question
+        return true
+    }
 
     override fun onReady(e: ReadyEvent) {
         if (e.jda.shardInfo.shardId == Jeanne.shardManager.shardsTotal - 1) { // Wait for all shards to be ready
@@ -153,7 +171,7 @@ class EventManager : ListenerAdapter() {
             return
         }
 
-        prefix = if (isMentionPrefix) content.substring(0, content.indexOf('>') + 1) else prefix
+        // prefix = if (isMentionPrefix) content.substring(0, content.indexOf('>') + 1) else prefix
         val index = if (isMentionPrefix) prefix.length + 1 else prefix.length
 
         val allArgs = content.substring(index).split("\\s+".toRegex())
@@ -220,6 +238,65 @@ class EventManager : ListenerAdapter() {
 
             GlobalScope.async {
                 command.execute(args, e)
+            }
+        } else {
+            val test = DatabaseManager.guildPrefixes[e.guild?.id] ?: Jeanne.config.prefix
+            if (test == "%mention%") return // Don't use cleverbot if the mention is set as prefix since this will conflict with actual commands
+
+            if (content.startsWith("<@$selfId>") || content.startsWith("<@!$selfId>")) {
+                val question = content.replace("^<@!?$selfId> ".toRegex(), "")
+                val user = e.author
+                val spamCheck = spamCheck(user.id, question)
+
+                if (spamCheck) {
+                    e.channel.sendTyping().queue()
+
+                    val owner = Jeanne.shardManager.getUserById(Jeanne.config.developer)
+                    val headers = mutableMapOf("Accept" to "application/json")
+                    headers.putAll(Jeanne.defaultHeaders)
+                    val request = Request.Builder()
+                            .headers(Headers.of(headers))
+                            .url("http://api.program-o.com/v2/chatbot/?bot_id=12&say=$question&convo_id=${user.id}&format=json")
+                            .build()
+
+                    Jeanne.httpClient.newCall(request).enqueue(object : Callback {
+                        override fun onFailure(call: Call, exception: IOException) {
+                            Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                                throw exception
+                            }
+                        }
+
+                        override fun onResponse(call: Call, response: Response) {
+                            Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                                val respstring = response.body()?.string()
+                                val message = response.message()
+                                val code = response.code()
+                                response.close()
+
+                                if (response.isSuccessful) {
+                                    if (respstring.isNullOrBlank())
+                                        return Utils(e).reply("Could not find an answer, please try again later")
+
+                                    val programo = Klaxon().parse<ProgramO>(respstring)
+                                    if (programo != null) {
+                                        val reply = programo.reply
+                                                .replace("Chatmundo", e.jda.selfUser.name, true)
+                                                .replace("<br/> ", "\n", true)
+                                                .replace("<br/>", "\n", true)
+                                                .replace("Elizabeth", "${owner.name}#${owner.discriminator}", true)
+                                                .replace("elizaibeth", "${owner.name}#${owner.discriminator}", true)
+
+                                        Utils(e).reply("**${e.member.effectiveName}**, $reply")
+                                    } else {
+                                        Utils(e).reply("Could not find an answer, please try again later")
+                                    }
+                                } else {
+                                    throw HttpException(code, message)
+                                }
+                            }
+                        }
+                    })
+                }
             }
         }
     }
