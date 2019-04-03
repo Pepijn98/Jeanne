@@ -261,13 +261,13 @@ class EventManager : ListenerAdapter() {
 
                     Jeanne.httpClient.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, exception: IOException) {
-                            Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                            Utils.catchAll("Exception occured in cleverbot", e.channel) {
                                 throw exception
                             }
                         }
 
                         override fun onResponse(call: Call, response: Response) {
-                            Utils.catchAll("Exception occured in cleverbot command", e.channel) {
+                            Utils.catchAll("Exception occured in cleverbot", e.channel) {
                                 val respstring = response.body()?.string()
                                 val message = response.message()
                                 val code = response.code()
