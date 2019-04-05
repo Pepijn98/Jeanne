@@ -53,7 +53,7 @@ class Cleverbot : Command(
                 headers.putAll(Jeanne.defaultHeaders)
                 val request = Request.Builder()
                         .headers(Headers.of(headers))
-                        .url("http://api.program-o.com/v2/chatbot/?bot_id=12&say=$question&convo_id=${user.id}&format=json")
+                        .url("http://api.program-o.com/v2/chatbot/?bot_id=12&say=$question&convo_id=93973697643155456&format=json")
                         .build()
 
                 Jeanne.httpClient.newCall(request).enqueue(object : Callback {
