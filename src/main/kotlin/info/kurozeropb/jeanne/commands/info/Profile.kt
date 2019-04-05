@@ -31,7 +31,7 @@ class Profile : Command(
 
             if (args.isNotEmpty() && args[0] == "update") {
                 if (args.size <= 2)
-                    return e.reply("Please specify what to update and the value to update.\nFor more help about this command please visit https://sophiebot.info/settings")
+                    return e.reply("Please specify what to update and the value to update.\nFor more help about this command please visit https://jeannebot.info/settings")
 
                 when (args[1]) {
                     "bg", "background" -> {

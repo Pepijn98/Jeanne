@@ -261,7 +261,7 @@ class Settings : Command(
                     val checkArgs = args.subList(1, args.size)
 
                     if (checkArgs.isEmpty()) {
-                        e.reply("Please specify a setting to check, visit the website (https://sophiebot.info/settings) to see which settings you can check")
+                        e.reply("Please specify a setting to check, visit the website (https://jeannebot.info/settings) to see which settings you can check")
                         return
                     }
 
@@ -311,10 +311,10 @@ class Settings : Command(
                             // TODO: Ignore/unignore certain commands
                             e.reply("Will be added in a future update")
                         }
-                        else -> e.reply("This is not a valid setting to check, visit the website (https://sophiebot.info/settings) to see which settings you can check")
+                        else -> e.reply("This is not a valid setting to check, visit the website (https://jeannebot.info/settings) to see which settings you can check")
                     }
                 }
-                else -> e.reply("That is not a valid setting, visit the website (https://sophiebot.info/settings) to see which settings you can change")
+                else -> e.reply("That is not a valid setting, visit the website (https://jeannebot.info/settings) to see which settings you can change")
             }
         }
     }
