@@ -37,3 +37,7 @@ command-ideas/
 
 # Config files
 config.toml
+bin/
+.project
+.settings/
+.classpath

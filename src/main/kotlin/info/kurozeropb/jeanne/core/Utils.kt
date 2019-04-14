@@ -253,7 +253,7 @@ class Utils(private val e: MessageReceivedEvent) {
                 val errorMessage = "```diff\n$message\n- ${exception.message ?: exception::class.simpleName ?: "Unkown exception"}```"
                 channel?.sendMessage(errorMessage)?.queue()
 
-                if (exception.message == "timeout") {
+                if (exception.message?.contains("timeout") == true) {
                     channel?.sendMessage("Something went wrong, please try again later.")?.queue()
                     return
                 }
