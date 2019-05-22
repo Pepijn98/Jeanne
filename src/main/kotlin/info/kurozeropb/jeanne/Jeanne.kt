@@ -45,7 +45,7 @@ object Jeanne {
         Utils.catchAll("Exception occured in main", null) {
             // Disable certain loggers
             val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
-            loggerLevels.forEach { key, value -> loggerContext.getLogger(key).level = value }
+            loggerLevels.forEach { (key, value) -> loggerContext.getLogger(key).level = value }
 
             // Initialize the bot config
             config = ConfigManager.read()
@@ -119,8 +119,8 @@ enum class BotLists(val url: String) {
     DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
     DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
     DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
-    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats"),
-    DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
+    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats")
+    // DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
 }
 
 enum class ExitStatus(val code: Int) {

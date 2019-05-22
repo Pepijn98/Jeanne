@@ -110,8 +110,8 @@ class Utils(private val e: MessageReceivedEvent) {
         val nullToNull = null to null
 
         fun sendGuildCountAll(guildCount: Int, shardCount: Int? = null) {
-            Utils.catchAll("Exception occured in sendGuildCountAll func", null) {
-                Jeanne.config.tokens.botlists.forEach { k, _ ->
+            catchAll("Exception occured in sendGuildCountAll func", null) {
+                Jeanne.config.tokens.botlists.forEach { (k, _) ->
                     when (k) {
                         BotLists.BOTLIST_SPACE.name -> sendGuildCount(BotLists.BOTLIST_SPACE, guildCount)
                         BotLists.BOTSFORDISCORD.name -> sendGuildCount(BotLists.BOTSFORDISCORD, guildCount)
@@ -120,7 +120,7 @@ class Utils(private val e: MessageReceivedEvent) {
                         BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
                         BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
                         BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
-                        BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
+                        // BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
                     }
                 }
             }
@@ -136,7 +136,7 @@ class Utils(private val e: MessageReceivedEvent) {
                 BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
                 BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
                 BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
-                BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
+                // BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
                 else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
             }
 
@@ -151,13 +151,13 @@ class Utils(private val e: MessageReceivedEvent) {
 
             Jeanne.httpClient.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, exception: IOException) {
-                    Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
+                    catchAll("Exception occured while sending guild count to ${list.name}", null) {
                         throw exception
                     }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    Utils.catchAll("Exception occured while sending guild count to ${list.name}", null) {
+                    catchAll("Exception occured while sending guild count to ${list.name}", null) {
                         if (response.isSuccessful) {
                             logger.info("Success sending guild count to ${list.name}")
                             response.close()
