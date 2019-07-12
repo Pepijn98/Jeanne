@@ -14,6 +14,8 @@ import okhttp3.Request
 data class Item(val link: String)
 data class Image(val large: String, val full: String)
 
+// TODO : Fix blocking method
+@Suppress("BlockingMethodInNonBlockingContext")
 class Zerochan : Command(
         name = "zerochan",
         category = Category.FUN,

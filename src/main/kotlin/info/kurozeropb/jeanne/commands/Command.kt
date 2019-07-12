@@ -11,7 +11,8 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent
 import java.awt.Color
 import java.io.File
 import java.io.InputStream
-import java.util.*
+import java.util.EventListener
+import java.util.Random
 import java.util.function.Consumer
 import java.util.logging.Logger
 import kotlin.system.exitProcess
@@ -59,7 +60,7 @@ abstract class Command(
         }
     }
 
-    fun <E> List<E>.random(random: java.util.Random): E = get(random.nextInt(size))
+    fun <E> List<E>.random(random: Random): E = get(random.nextInt(size))
 
     fun String.toMessage(): Message = MessageBuilder().append(this).build()
 

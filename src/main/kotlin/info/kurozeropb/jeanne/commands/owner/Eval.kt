@@ -32,7 +32,7 @@ class Eval : Command(
 
             val scope = SimpleScriptContext().apply {
                 getBindings(ScriptContext.ENGINE_SCOPE).apply {
-                    variables.forEach { k, o -> this[k] = o }
+                    variables.forEach { (k, o) -> this[k] = o }
                 }
             }
 

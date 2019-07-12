@@ -20,6 +20,7 @@ import java.net.Proxy
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
+import kotlin.math.floor
 
 object Jeanne {
     private val bootTime = System.currentTimeMillis()
@@ -100,7 +101,7 @@ object Jeanne {
         // Updates the playing game every 10 minutes
         Timer().schedule(600_000, 600_000) {
             Utils.catchAll("Failed to update playing game", null) {
-                val game = games[Math.floor((Math.random() * games.size)).toInt()]
+                val game = games[floor((Math.random() * games.size)).toInt()]
                 val name = game.name
                         .replace(Regex("%USERSIZE%"), shardManager.users.size.toString())
                         .replace(Regex("%GUILDSIZE%"), shardManager.guilds.size.toString())
@@ -119,8 +120,8 @@ enum class BotLists(val url: String) {
     DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
     DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
     DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
-    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats")
-    // DISCORDBOTS_GROUP("https://discordbots.group/api/bot/237578660708745216")
+    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats"),
+    DISCORDBOTS_GROUP("https://api.discordbots.group/v1/bot/237578660708745216")
 }
 
 enum class ExitStatus(val code: Int) {

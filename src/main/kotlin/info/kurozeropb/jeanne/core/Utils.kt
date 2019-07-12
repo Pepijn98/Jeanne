@@ -120,7 +120,7 @@ class Utils(private val e: MessageReceivedEvent) {
                         BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
                         BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
                         BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
-                        // BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
+                        BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
                     }
                 }
             }
@@ -136,7 +136,7 @@ class Utils(private val e: MessageReceivedEvent) {
                 BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
                 BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
                 BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
-                // BotLists.DISCORDBOTS_GROUP -> "{\"count\": $guildCount}"
+                BotLists.DISCORDBOTS_GROUP -> "{\"shards\": ${Jeanne.shardManager.shards.map { it.guilds.size }}"
                 else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
             }
 
