@@ -5,7 +5,6 @@ import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.AzurLane
 import info.kurozeropb.jeanne.core.HttpException
-import info.kurozeropb.jeanne.core.Kitsu
 import info.kurozeropb.jeanne.core.Utils
 import net.dv8tion.jda.core.EmbedBuilder
 import net.dv8tion.jda.core.Permission
