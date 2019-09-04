@@ -92,7 +92,7 @@ object Jeanne {
             shardManager = DefaultShardManagerBuilder()
                     .setShardsTotal(-1)
                     .setToken(token)
-                    .setGame(Game.playing("https://jeannebot.info/"))
+                    .setGame(Game.playing("https://kurozeropb.github.io/Jeanne"))
                     .setBulkDeleteSplittingEnabled(false)
                     .addEventListeners(EventManager())
                     .build()
