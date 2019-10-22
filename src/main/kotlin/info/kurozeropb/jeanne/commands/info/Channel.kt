@@ -2,9 +2,9 @@ package info.kurozeropb.jeanne.commands.info
 
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 
@@ -39,7 +39,7 @@ class Channel : Command(
                         **Category:** ${channel.parent?.name ?: "-"}
                     """.trimIndent(), true)
                     .addField("Topic", channel.topic ?: "-", false)
-                    .setFooter("ID: ${channel.id} | Created on: ${channel.creationTime.format(formatter)}", null)
+                    .setFooter("ID: ${channel.id} | Created on: ${channel.timeCreated.format(formatter)}", null)
             )
         }
     }

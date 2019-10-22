@@ -7,7 +7,7 @@ import info.kurozeropb.jeanne.CommandData
 import info.kurozeropb.jeanne.Config
 import info.kurozeropb.jeanne.User as dbUser
 import info.kurozeropb.jeanne.Guild as dbGuild
-import net.dv8tion.jda.core.entities.Guild
+import net.dv8tion.jda.api.entities.Guild
 import org.litote.kmongo.*
 import kotlin.system.measureTimeMillis
 

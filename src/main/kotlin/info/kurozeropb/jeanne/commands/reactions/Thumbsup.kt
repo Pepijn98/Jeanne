@@ -6,8 +6,8 @@ import com.github.natanbc.weeb4j.image.NsfwFilter
 import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import okhttp3.Headers
 import okhttp3.Request
 
@@ -34,7 +34,7 @@ class Thumbsup : Command(
                 if (resp.isSuccessful) {
                     val body = resp.body()
                     if (body != null)
-                        e.reply(body.byteStream(), "${image.id}.${image.fileType.name.toLowerCase()}", if (member != null) "**${e.member.effectiveName}** gives **${member.effectiveName}** a thumbsup" else null)
+                        e.reply(body.byteStream(), "${image.id}.${image.fileType.name.toLowerCase()}", if (member != null) "**${e.member?.effectiveName}** gives **${member.effectiveName}** a thumbsup" else null)
                     else
                         e.reply("Something went wrong while trying to fetch the image")
                 } else {

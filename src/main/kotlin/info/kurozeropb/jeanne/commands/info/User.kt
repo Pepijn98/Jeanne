@@ -3,9 +3,9 @@ package info.kurozeropb.jeanne.commands.info
 import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 
@@ -35,11 +35,12 @@ class User : Command(
                         args.isEmpty() -> e.member
                         else -> return e.reply("No member was found with the username **${args.joinToString(" ")}**")
                     }
+                    ?: return
 
             val mutualGuildCount = Jeanne.shardManager.getMutualGuilds(member.user).size
-            val joinedDate = member.joinDate.format(formatter)
-            val memberRoles = member.roles?.joinToString(", ") { it.name } ?: "-"
-            val creationDate = member.user.creationTime.format(formatter)
+            val joinedDate = member.timeJoined.format(formatter)
+            val memberRoles = member.roles.joinToString(", ") { it.name }
+            val creationDate = member.user.timeCreated.format(formatter)
             e.reply(EmbedBuilder()
                     .setTitle("User info of ${member.effectiveName}", member.user.effectiveAvatarUrl)
                     .setThumbnail(member.user.effectiveAvatarUrl)
@@ -48,7 +49,7 @@ class User : Command(
                     .addField("Bot", if (member.user.isBot) "Yes" else "No", true)
                     .addField("Mutual servers", mutualGuildCount.toString(), true)
                     .addField("Status", member.onlineStatus.key, true)
-                    .addField("Playing", member.game?.name ?: "-", true)
+                    .addField("Playing", if (member.activities.size >= 1) member.activities[0].name else "-", true)
                     .addField("Joined on", joinedDate, false)
                     .addField("Roles", memberRoles, false)
                     .setFooter("ID: ${member.user.id} | Created on: $creationDate", null))

@@ -3,10 +3,10 @@ package info.kurozeropb.jeanne.commands.info
 import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.JDAInfo
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.JDAInfo
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 class About : Command(
         name = "about",

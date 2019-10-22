@@ -5,15 +5,15 @@ import info.kurozeropb.jeanne.managers.ConfigManager
 import info.kurozeropb.jeanne.managers.DatabaseManager
 import info.kurozeropb.jeanne.managers.EventManager
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder
-import net.dv8tion.jda.bot.sharding.ShardManager
-import net.dv8tion.jda.core.entities.Game
 import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.jeanne.core.games
+import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
+import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
@@ -92,7 +92,7 @@ object Jeanne {
             shardManager = DefaultShardManagerBuilder()
                     .setShardsTotal(-1)
                     .setToken(token)
-                    .setGame(Game.playing("https://kurozeropb.github.io/Jeanne"))
+                    .setActivity(Activity.watching("https://jeannebot.com"))
                     .setBulkDeleteSplittingEnabled(false)
                     .addEventListeners(EventManager())
                     .build()
@@ -106,7 +106,7 @@ object Jeanne {
                         .replace(Regex("%USERSIZE%"), shardManager.users.size.toString())
                         .replace(Regex("%GUILDSIZE%"), shardManager.guilds.size.toString())
 
-                shardManager.setGame(Game.of(game.type, name))
+                shardManager.setActivity(Activity.of(game.type, name))
             }
         }
     }
@@ -120,8 +120,7 @@ enum class BotLists(val url: String) {
     DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
     DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
     DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
-    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats"),
-    DISCORDBOTS_GROUP("https://api.discordbots.group/v1/bot/237578660708745216")
+    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats")
 }
 
 enum class ExitStatus(val code: Int) {

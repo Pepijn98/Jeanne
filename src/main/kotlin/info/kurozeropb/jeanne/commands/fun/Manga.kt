@@ -6,11 +6,11 @@ import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.HttpException
 import info.kurozeropb.jeanne.core.Utils
 import info.kurozeropb.jeanne.core.Kitsu
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import okhttp3.*
 import java.io.IOException
-import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.api.EmbedBuilder
 
 class Manga : Command(
         name = "manga",

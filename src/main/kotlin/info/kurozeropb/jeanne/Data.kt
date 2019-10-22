@@ -2,8 +2,8 @@ package info.kurozeropb.jeanne
 
 import com.beust.klaxon.Json
 import info.kurozeropb.jeanne.commands.Command
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.entities.Game
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Activity
 import java.time.OffsetDateTime
 
 data class Guild(
@@ -74,7 +74,7 @@ data class Cooldown(
 
 data class PlayingGame(
         val name: String,
-        val type: Game.GameType
+        val type: Activity.ActivityType
 )
 
 data class QuestionCache(

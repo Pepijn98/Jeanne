@@ -3,8 +3,8 @@ package info.kurozeropb.jeanne.commands.moderation
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
 import info.kurozeropb.jeanne.core.isBannableBy
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 class Ban : Command(
         name = "ban",
@@ -55,7 +55,7 @@ class Ban : Command(
                 if (isBannable.not())
                     return e.reply("I can't ban this member")
 
-                e.guild.controller
+                e.guild
                         .ban(mentionedMember, deleteDays)
                         .reason(reason)
                         .queue({

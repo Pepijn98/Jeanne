@@ -3,23 +3,22 @@ package info.kurozeropb.jeanne.core
 import com.github.ajalt.mordant.TermColors
 import info.kurozeropb.jeanne.BotLists
 import info.kurozeropb.jeanne.CommandData
-import net.dv8tion.jda.core.MessageBuilder
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
-import net.dv8tion.jda.core.requests.RestAction
+import net.dv8tion.jda.api.MessageBuilder
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.requests.RestAction
 import kotlinx.coroutines.future.await
 import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.PlayingGame
 import info.kurozeropb.jeanne.commands.Registry
 import info.kurozeropb.jeanne.managers.DatabaseManager
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.entities.*
-import net.dv8tion.jda.core.events.guild.GuildBanEvent
-import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent
-import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent
-import net.dv8tion.jda.webhook.WebhookClientBuilder
-import net.dv8tion.jda.webhook.WebhookMessageBuilder
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.guild.GuildBanEvent
+import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent
+import net.dv8tion.jda.api.utils.AttachmentOption
 import okhttp3.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -34,23 +33,23 @@ import java.util.logging.Logger
 import kotlin.system.measureTimeMillis
 
 val games = listOf(
-        PlayingGame("with Senpai", Game.GameType.DEFAULT),
-        PlayingGame("with my master", Game.GameType.DEFAULT),
-        PlayingGame("anime", Game.GameType.WATCHING),
-        PlayingGame("secret things", Game.GameType.WATCHING),
-        PlayingGame("with your feelings", Game.GameType.DEFAULT),
-        PlayingGame("https://jeannebot.info", Game.GameType.WATCHING),
-        PlayingGame("with %USERSIZE% users", Game.GameType.DEFAULT),
-        PlayingGame("in %GUILDSIZE% servers", Game.GameType.DEFAULT),
-        PlayingGame("%GUILDSIZE% servers", Game.GameType.WATCHING),
-        PlayingGame("%USERSIZE% users", Game.GameType.WATCHING),
-        PlayingGame("music", Game.GameType.LISTENING)
+        PlayingGame("with Senpai", Activity.ActivityType.DEFAULT),
+        PlayingGame("with my master", Activity.ActivityType.DEFAULT),
+        PlayingGame("anime", Activity.ActivityType.WATCHING),
+        PlayingGame("secret things", Activity.ActivityType.WATCHING),
+        PlayingGame("with your feelings", Activity.ActivityType.DEFAULT),
+        PlayingGame("https://jeannebot.info", Activity.ActivityType.WATCHING),
+        PlayingGame("with %USERSIZE% users", Activity.ActivityType.DEFAULT),
+        PlayingGame("in %GUILDSIZE% servers", Activity.ActivityType.DEFAULT),
+        PlayingGame("%GUILDSIZE% servers", Activity.ActivityType.WATCHING),
+        PlayingGame("%USERSIZE% users", Activity.ActivityType.WATCHING),
+        PlayingGame("music", Activity.ActivityType.LISTENING)
 )
 
 @Suppress("MemberVisibilityCanBePrivate")
 class Utils(private val e: MessageReceivedEvent) {
 
-    fun embedColor(): Color = e.guild?.selfMember?.color ?: Jeanne.embedColor
+    fun embedColor(): Color = e.guild.selfMember.color ?: Jeanne.embedColor
 
     fun reply(msg: Message, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
@@ -69,28 +68,43 @@ class Utils(private val e: MessageReceivedEvent) {
 
     fun reply(data: InputStream, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
-            if (message != null)
-                e.channel.sendFile(data, fileName, build(message)).queue(success)
-            else
+            if (message != null) {
+                val embed = EmbedBuilder()
+                        .setImage("attachment://$fileName")
+                        .setDescription(message)
+
+                e.channel.sendFile(data, fileName).embed(embed.build()).queue(success)
+            } else {
                 e.channel.sendFile(data, fileName).queue(success)
+            }
         }
     }
 
     fun reply(file: File, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
-            if (message != null)
-                e.channel.sendFile(file, fileName, build(message)).queue(success)
-            else
+            if (message != null) {
+                val embed = EmbedBuilder()
+                        .setImage("attachment://$fileName")
+                        .setDescription(message)
+
+                e.channel.sendFile(file, fileName).embed(embed.build()).queue(success)
+            } else {
                 e.channel.sendFile(file, fileName).queue(success)
+            }
         }
     }
 
     fun reply(bytes: ByteArray, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
-            if (message != null)
-                e.channel.sendFile(bytes, fileName, build(message)).queue(success)
-            else
+            if (message != null) {
+                val embed = EmbedBuilder()
+                        .setImage("attachment://$fileName")
+                        .setDescription(message)
+
+                e.channel.sendFile(bytes, fileName).embed(embed.build()).queue(success)
+            } else {
                 e.channel.sendFile(bytes, fileName).queue(success)
+            }
         }
     }
 
@@ -120,7 +134,6 @@ class Utils(private val e: MessageReceivedEvent) {
                         BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
                         BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
                         BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
-                        BotLists.DISCORDBOTS_GROUP.name -> sendGuildCount(BotLists.DISCORDBOTS_GROUP, guildCount)
                     }
                 }
             }
@@ -136,7 +149,6 @@ class Utils(private val e: MessageReceivedEvent) {
                 BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
                 BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
                 BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
-                BotLists.DISCORDBOTS_GROUP -> "{\"shards\": ${Jeanne.shardManager.shards.map { it.guilds.size }}"
                 else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
             }
 
@@ -262,15 +274,16 @@ class Utils(private val e: MessageReceivedEvent) {
                     return
                 }
 
-                val webhookUrl = if (Jeanne.config.env.startsWith("prod")) Jeanne.config.tokens.exception_hook else Jeanne.config.tokens.dev_exception_hook
-                val webhook = WebhookClientBuilder(webhookUrl).build()
-                val webhookMessage = WebhookMessageBuilder()
-                        .setAvatarUrl(Jeanne.shardManager.applicationInfo.jda.selfUser.effectiveAvatarUrl)
-                        .setUsername(Jeanne.shardManager.applicationInfo.jda.selfUser.name)
-                        .setContent(errorMessage)
-                        .build()
-                webhook.send(webhookMessage)
-                webhook.close()
+//                val webhookUrl = if (Jeanne.config.env.startsWith("prod")) Jeanne.config.tokens.exception_hook else Jeanne.config.tokens.dev_exception_hook
+//                val webhook = WebhookClientBuilder(webhookUrl).build()
+//                val applicationInfo = Jeanne.shardManager.retrieveApplicationInfo().complete()
+//                val webhookMessage = WebhookMessageBuilder()
+//                        .setAvatarUrl(applicationInfo.jda.selfUser.effectiveAvatarUrl)
+//                        .setUsername(applicationInfo.jda.selfUser.name)
+//                        .setContent(errorMessage)
+//                        .build()
+//                webhook.send(webhookMessage)
+//                webhook.close()
             }
         }
 
@@ -278,13 +291,14 @@ class Utils(private val e: MessageReceivedEvent) {
         fun embedColor(e: GuildMemberLeaveEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildBanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
-        fun embedColor(e: GuildMemberNickChangeEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
+        fun embedColor(e: GuildMemberUpdateNicknameEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
 
         suspend fun findUser(str: String, e: MessageReceivedEvent? = null): User? {
             if (str.isEmpty())
                 return null
 
-            val jda = e?.jda ?: Jeanne.shardManager.applicationInfo.jda
+            val applicationInfo = Jeanne.shardManager.retrieveApplicationInfo().complete()
+            val jda = e?.jda ?: applicationInfo.jda
 
             val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
             val isValidID = discordIdPattern.matches(id)
@@ -356,9 +370,13 @@ private fun Member.getHighestRole() = if (roles.size == 0) {
     }
 }
 
-fun Member.isKickableBy(kicker: Member): Boolean = isBannableBy(kicker)
+fun Member.isKickableBy(kicker: Member?): Boolean = isBannableBy(kicker)
 
-fun Member.isBannableBy(banner: Member): Boolean {
+fun Member.isBannableBy(banner: Member?): Boolean {
+    if (banner == null) {
+        return false
+    }
+
     if (this == banner) {
         return false
     }

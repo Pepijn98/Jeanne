@@ -8,20 +8,21 @@ import info.kurozeropb.jeanne.Cooldown
 import info.kurozeropb.jeanne.Guild
 import info.kurozeropb.jeanne.User
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.entities.ChannelType
-import net.dv8tion.jda.core.events.ReadyEvent
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
-import net.dv8tion.jda.core.hooks.ListenerAdapter
+import net.dv8tion.jda.api.entities.ChannelType
+import net.dv8tion.jda.api.events.ReadyEvent
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.hooks.ListenerAdapter
 import kotlin.math.floor
 import kotlin.math.sqrt
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.events.guild.GuildBanEvent
-import net.dv8tion.jda.core.events.guild.GuildUnbanEvent
-import net.dv8tion.jda.core.events.guild.member.*
-import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.events.guild.GuildBanEvent
+import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
+import net.dv8tion.jda.api.events.guild.member.*
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent
+import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent
 import org.litote.kmongo.*
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -75,30 +76,24 @@ class EventManager : ListenerAdapter() {
         }
     }
 
-    override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent?) {
-        if (event == null)
-            return
-
+    override fun onGuildMemberRoleAdd(event: GuildMemberRoleAddEvent) {
         if (event.guild.id == "240059867744698368" && event.roles.map { it.id }.contains("464548479792971786")) {
             val user = DatabaseManager.users.findOne(User::id eq event.user.id)
             if (user == null) {
                 DatabaseManager.users.insertOne(User(event.user.id, donator = true))
             } else {
-                DatabaseManager.users.updateOne(User::id eq event.user.id, set(User::donator, true))
+                DatabaseManager.users.updateOne(User::id eq event.user.id, setValue(User::donator, true))
             }
         }
     }
 
-    override fun onGuildMemberRoleRemove(event: GuildMemberRoleRemoveEvent?) {
-        if (event == null)
-            return
-
+    override fun onGuildMemberRoleRemove(event: GuildMemberRoleRemoveEvent) {
         if (event.guild.id == "240059867744698368" && event.roles.map { it.id }.contains("464548479792971786")) {
             val user = DatabaseManager.users.findOne(User::id eq event.user.id)
             if (user == null) {
                 DatabaseManager.users.insertOne(User(event.user.id, donator = false))
             } else {
-                DatabaseManager.users.updateOne(User::id eq event.user.id, set(User::donator, false))
+                DatabaseManager.users.updateOne(User::id eq event.user.id, setValue(User::donator, false))
             }
         }
     }
@@ -111,12 +106,13 @@ class EventManager : ListenerAdapter() {
         val selfId = e.jda.selfUser.id
         val ctx = Utils(e)
 
-        if (e.guild != null && !e.guild.isAvailable)
+        if (!e.guild.isAvailable)
             return
+
         if (e.isWebhookMessage || e.author.isFake || e.author.isBot || e.author.id == selfId)
             return
 
-        var prefix = DatabaseManager.guildPrefixes[e.guild?.id] ?: Jeanne.config.prefix
+        var prefix = DatabaseManager.guildPrefixes[e.guild.id] ?: Jeanne.config.prefix
         if (prefix == "%mention%")
             prefix = e.jda.selfUser.asMention
 
@@ -150,7 +146,7 @@ class EventManager : ListenerAdapter() {
                     if (guild != null && guild.levelupEnabled && !arrayOf("110373943822540800", "264445053596991498").contains(e.guild.id)) {
                         var message = guild.levelupMessage
                         message = message.replace("%user%", e.author.name)
-                        message = message.replace("%mention%", e.member.asMention)
+                        message = message.replace("%mention%", e.member?.asMention ?: "")
                         message = message.replace("%oldLevel%", level.toString())
                         message = message.replace("%newLevel%", currLevel.toString())
                         message = message.replace("%points%", points.toString())
@@ -158,7 +154,7 @@ class EventManager : ListenerAdapter() {
                     }
                 } else {
                     DatabaseManager.usersData[e.author.id]!!["points"] = points
-                    DatabaseManager.users.updateOne(User::id eq e.author.id, set(User::points, points))
+                    DatabaseManager.users.updateOne(User::id eq e.author.id, setValue(User::points, points))
                 }
             } else {
                 DatabaseManager.usersData[e.author.id] = mutableMapOf("level" to 0.0, "points" to 0.0)
@@ -190,7 +186,7 @@ class EventManager : ListenerAdapter() {
                 val cooldown = cooldowns.find { it.id == e.author.id && it.command.name == command.name }
 
                 if (cooldown != null) {
-                    val timeUntil = cooldown.time.until(e.message.creationTime, ChronoUnit.SECONDS)
+                    val timeUntil = cooldown.time.until(e.message.timeCreated, ChronoUnit.SECONDS)
                     val timeLeft = command.cooldown - timeUntil
 
                     if (timeUntil < command.cooldown && command.name == cooldown.command.name) {
@@ -202,7 +198,7 @@ class EventManager : ListenerAdapter() {
                         cooldowns.remove(cooldown)
                 }
 
-                cooldowns.add(Cooldown(e.author.id, command, e.message.creationTime))
+                cooldowns.add(Cooldown(e.author.id, command, e.message.timeCreated))
             }
 
             if (command.isDeveloperOnly && e.author.id != Jeanne.config.developer) {
@@ -222,8 +218,8 @@ class EventManager : ListenerAdapter() {
             }
 
             if (e.isFromType(ChannelType.PRIVATE).not() && command.userPermissions.isNotEmpty()) {
-                val hasPerms = e.member.hasPermission(e.textChannel, command.userPermissions)
-                if (!hasPerms && e.author.id != Jeanne.config.developer) {
+                val hasPerms = e.member?.hasPermission(e.textChannel, command.userPermissions)
+                if (hasPerms != null && !hasPerms && e.author.id != Jeanne.config.developer) {
                     ctx.reply("""
                         You are missing certain permissions required by this command
                         Required permissions are: ${command.userPermissions.joinToString(", ")}
@@ -238,13 +234,11 @@ class EventManager : ListenerAdapter() {
         }
     }
 
-    override fun onUserUpdateName(event: UserUpdateNameEvent?) {
-        if (event != null) {
-            val newName = event.newName
-            if (newName.startsWith("Deleted User", true)) {
-                val userID = event.entity.id
-                DatabaseManager.users.findOneAndDelete(User::id eq userID)
-            }
+    override fun onUserUpdateName(event: UserUpdateNameEvent) {
+        val newName = event.newName
+        if (newName.startsWith("Deleted User", true)) {
+            val userID = event.entity.id
+            DatabaseManager.users.findOneAndDelete(User::id eq userID)
         }
     }
 
@@ -279,7 +273,7 @@ class EventManager : ListenerAdapter() {
                     .setTitle("Member joined")
                     .addField("Name", e.user.name, true)
                     .setThumbnail(e.user.effectiveAvatarUrl)
-                    .setTimestamp(e.user.creationTime)
+                    .setTimestamp(e.user.timeCreated)
                     .build()).queue()
         }
     }
@@ -295,7 +289,7 @@ class EventManager : ListenerAdapter() {
                     .setTitle("Member left")
                     .addField("Name", e.user.name, true)
                     .setThumbnail(e.user.effectiveAvatarUrl)
-                    .setTimestamp(e.user.creationTime)
+                    .setTimestamp(e.user.timeCreated)
                     .build()).queue()
         }
     }
@@ -311,7 +305,7 @@ class EventManager : ListenerAdapter() {
                     .setTitle("Member banned")
                     .addField("Name", e.user.name, true)
                     .setThumbnail(e.user.effectiveAvatarUrl)
-                    .setTimestamp(e.user.creationTime)
+                    .setTimestamp(e.user.timeCreated)
                     .build()).queue()
         }
     }
@@ -327,12 +321,12 @@ class EventManager : ListenerAdapter() {
                     .setTitle("Member unbanned")
                     .addField("Name", e.user.name, true)
                     .setThumbnail(e.user.effectiveAvatarUrl)
-                    .setTimestamp(e.user.creationTime)
+                    .setTimestamp(e.user.timeCreated)
                     .build()).queue()
         }
     }
 
-    override fun onGuildMemberNickChange(e: GuildMemberNickChangeEvent) {
+    override fun onGuildMemberUpdateNickname(e: GuildMemberUpdateNicknameEvent) {
         val db = DatabaseManager(e.guild)
         val guild = db.getGuildData() ?:  return
 
@@ -341,10 +335,10 @@ class EventManager : ListenerAdapter() {
             channel.sendMessage(EmbedBuilder()
                     .setColor(Utils.embedColor(e))
                     .setTitle("Nickname changed")
-                    .addField("Old", e.prevNick ?: "-", true)
-                    .addField("New", e.newNick ?: "-", true)
+                    .addField("Old", e.oldNickname ?: "-", true)
+                    .addField("New", e.newNickname ?: "-", true)
                     .setThumbnail(e.user.effectiveAvatarUrl)
-                    .setTimestamp(e.user.creationTime)
+                    .setTimestamp(e.user.timeCreated)
                     .build()).queue()
         }
     }

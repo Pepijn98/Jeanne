@@ -5,11 +5,11 @@ import info.kurozeropb.jeanne.User
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.managers.DatabaseManager
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import org.litote.kmongo.set
+import org.litote.kmongo.setValue
 
 class Update : Command(
         name = "update",
@@ -45,13 +45,13 @@ class Update : Command(
                     when (option) {
                         "blacklisted" -> {
                             val newValue = value == "true"
-                            DatabaseManager.users.updateOne(User::id eq user.id, set(User::blacklisted, newValue))
-                            e.reply("Successfully updated blacklisted to **$newValue** for user **${user.name ?: id}**")
+                            DatabaseManager.users.updateOne(User::id eq user.id, setValue(User::blacklisted, newValue))
+                            e.reply("Successfully updated blacklisted to **$newValue** for user **${user.name}**")
                         }
                         "donator" -> {
                             val newValue = value == "true"
-                            DatabaseManager.users.updateOne(User::id eq user.id, set(User::donator, newValue))
-                            e.reply("Successfully updated donator to **$newValue** for user **${user.name ?: id}**")
+                            DatabaseManager.users.updateOne(User::id eq user.id, setValue(User::donator, newValue))
+                            e.reply("Successfully updated donator to **$newValue** for user **${user.name}**")
                         }
                         "currency" -> e.reply("Comming soon")
                         else -> e.reply("Not a valid argument, option can only be blacklisted, donator or currency")
@@ -66,7 +66,7 @@ class Update : Command(
                     when (option) {
                         "blacklisted" -> {
                             val newValue = value == "true"
-                            DatabaseManager.guilds.updateOne(Guild::id eq id, set(Guild::blacklisted, newValue))
+                            DatabaseManager.guilds.updateOne(Guild::id eq id, setValue(Guild::blacklisted, newValue))
                             e.reply("Successfully updated blacklisted to **$newValue** for guild **${discordGuild?.name ?: id}**")
                         }
                         else -> e.reply("Not a valid argument, option can only be blacklisted")

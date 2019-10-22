@@ -5,8 +5,8 @@ import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.commands.Registry
 import info.kurozeropb.jeanne.managers.DatabaseManager
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.lang.StringBuilder
 
 class Help : Command(
@@ -22,7 +22,7 @@ class Help : Command(
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
         Utils.catchAll("Exception occured in help command", e.channel) {
-            var prefix = DatabaseManager.guildPrefixes[e.guild?.id] ?: Jeanne.config.prefix
+            var prefix = DatabaseManager.guildPrefixes[e.guild.id] ?: Jeanne.config.prefix
             if (prefix == "%mention%")
                 prefix = e.jda.selfUser.asMention
 

@@ -5,11 +5,12 @@ import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.managers.DatabaseManager
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.litote.kmongo.SetTo
 import org.litote.kmongo.eq
 import org.litote.kmongo.set
+import org.litote.kmongo.setValue
 
 @Suppress("unused")
 class Settings : Command(
@@ -56,7 +57,7 @@ class Settings : Command(
 
                     if (guild != null) {
                         DatabaseManager.guildPrefixes[e.guild.id] = newPrefix
-                        DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, set(Guild::prefix, newPrefix))
+                        DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, setValue(Guild::prefix, newPrefix))
                         var prefix = newPrefix
                         if (prefix == "%mention%")
                             prefix = e.jda.selfUser.asMention
@@ -88,7 +89,7 @@ class Settings : Command(
                             return
                         }
 
-                        DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, set(Guild::welcomeEnabled, false))
+                        DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, setValue(Guild::welcomeEnabled, false))
                         e.reply("Welcome message has been disabled")
                     } else {
                         if (welcomeArgs.size == 1) {
@@ -211,7 +212,7 @@ class Settings : Command(
                                 if (noEntry) {
                                     DatabaseManager.guilds.insertOne(Guild(e.guild.id, logChannel = e.message.mentionedChannels[0].id))
                                 } else {
-                                    DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, set(Guild::logChannel, e.message.mentionedChannels[0].id))
+                                    DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, setValue(Guild::logChannel, e.message.mentionedChannels[0].id))
                                 }
                                 e.reply("Set the log channel to **${e.message.mentionedChannels[0].name}**")
                             } else {
@@ -230,7 +231,7 @@ class Settings : Command(
                                 DatabaseManager.guilds.insertOne(Guild(e.guild.id, subbedEvents = ArrayList(events)))
                             } else {
                                 guild!!.subbedEvents.addAll(events)
-                                DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, set(Guild::subbedEvents, guild.subbedEvents))
+                                DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, setValue(Guild::subbedEvents, guild.subbedEvents))
                             }
                             e.reply("Subbed to the events: **${events.joinToString(", ")}**")
                         }
@@ -248,7 +249,7 @@ class Settings : Command(
                             }
 
                             guild!!.subbedEvents.removeAll(events)
-                            DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, set(Guild::subbedEvents, guild.subbedEvents))
+                            DatabaseManager.guilds.updateOne(Guild::id eq e.guild.id, setValue(Guild::subbedEvents, guild.subbedEvents))
                             e.reply("Unsubbed to the events: **${events.joinToString(", ")}**")
                         }
                     }

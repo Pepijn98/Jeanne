@@ -4,9 +4,9 @@ import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.Status
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
 class Shard : Command(
         name = "shards",
@@ -23,7 +23,7 @@ class Shard : Command(
             val shardCount = Jeanne.shardManager.shardsTotal
             val avgShardLatency = Jeanne.shardManager.shards
                     .stream()
-                    .map { shard -> shard.ping }
+                    .map { shard -> shard.gatewayPing }
                     .reduce { a, b -> a + b }
                     .get() / shardCount
 
@@ -35,7 +35,8 @@ class Shard : Command(
                 embed.addField("Shard ${shard.shardInfo.shardId} ${Status.valueOf(shard.status.name).emote} ${if (e.guild.jda.shardInfo.shardId == shard.shardInfo.shardId) "(current)" else ""}", """
                     ${shard.guilds.size} guilds
                     ${shard.users.size} users
-                    ${shard.ping}ms
+                    Gateway ${shard.gatewayPing}ms
+                    Rest ${shard.restPing.complete()}ms
                 """.trimIndent(), true)
             }
 

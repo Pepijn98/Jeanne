@@ -2,8 +2,8 @@ package info.kurozeropb.jeanne.commands.moderation
 
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.lang.NumberFormatException
 import java.time.OffsetDateTime
 
@@ -37,7 +37,7 @@ class Prune : Command(
 
             val time = OffsetDateTime.now().minusWeeks(2)
             history.retrievePast(messagesToDelete).queue {
-                val messages = it.filter { msg -> msg.creationTime.isAfter(time) }
+                val messages = it.filter { msg -> msg.timeCreated.isAfter(time) }
                 when {
                     messages.size >= 2 -> e.message.textChannel.deleteMessages(messages).queue()
                     messages.size == 1 -> messages.first().delete().queue()

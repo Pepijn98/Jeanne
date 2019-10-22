@@ -4,11 +4,11 @@ import info.kurozeropb.jeanne.Jeanne
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
 import info.kurozeropb.jeanne.core.Kitsu
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import okhttp3.*
 import java.io.IOException
-import net.dv8tion.jda.core.EmbedBuilder
+import net.dv8tion.jda.api.EmbedBuilder
 import com.beust.klaxon.Klaxon
 import info.kurozeropb.jeanne.core.HttpException
 
@@ -22,9 +22,6 @@ class Anime : Command(
 ) {
 
     override suspend fun execute(args: List<String>, e: MessageReceivedEvent) {
-//        e.reply("⚠ This command is temporarily disabled ⚠\n\n" +
-//                "This command uses Kitsu's api but Kitsu is having trouble paying for their host\n" +
-//                "To help them out and to get this command back donate at: https://oof.kitsu.io/")
         val name = args.joinToString("-").toLowerCase()
         val headers = mutableMapOf(
                 "Content-Type" to "application/vnd.api+json",

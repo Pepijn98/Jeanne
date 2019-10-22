@@ -2,10 +2,10 @@ package info.kurozeropb.jeanne.commands.info
 
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.OnlineStatus
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.concurrent.TimeUnit
@@ -42,7 +42,7 @@ class Guild : Command(
                         **${e.guild.textChannels.size}** Text
                         **${e.guild.voiceChannels.size}** Voice
                         **${e.guild.categories.size}** Categories
-                        **AFK:** ${if (e.guild.afkChannel != null) "#${e.guild.afkChannel.name}" else "-"}
+                        **AFK:** ${if (e.guild.afkChannel != null) "#${e.guild.afkChannel!!.name}" else "-"}
                         **AFK Timeout:** ${TimeUnit.SECONDS.toMinutes(e.guild.afkTimeout.seconds.toLong()).toInt()} Minutes
                         ${Utils.ZERO_WIDTH_SPACE}
                     """.trimIndent(), true)
@@ -56,7 +56,7 @@ class Guild : Command(
                         **MFA:** ${e.guild.requiredMFALevel.name.toLowerCase().replace("_", " ").capitalize()}
                         **Roles:** ${e.guild.roles.size}
                     """.trimIndent(), true)
-                    .setFooter("ID: ${e.guild.id} | Created on: ${e.guild.creationTime.format(formatter)}", null)
+                    .setFooter("ID: ${e.guild.id} | Created on: ${e.guild.timeCreated.format(formatter)}", null)
             )
         }
     }

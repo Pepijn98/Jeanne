@@ -2,8 +2,8 @@ package info.kurozeropb.jeanne.commands.`fun`
 
 import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.EmbedBuilder
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.EmbedBuilder
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 
@@ -34,7 +34,7 @@ class Raffle : Command(
                     .setTitle("The winner is:")
                     .setDescription("${random.asMention}\n[${random.user.name}#${random.user.discriminator} - (${random.user.id})]\n\n**Congratulations** <a:NekoHype:425781622814539776>")
                     .setThumbnail(random.user.effectiveAvatarUrl)
-                    .setFooter("Joined on: ${random.joinDate.format(formatter)}", null))
+                    .setFooter("Joined on: ${random.timeJoined.format(formatter)}", null))
         }
     }
 }

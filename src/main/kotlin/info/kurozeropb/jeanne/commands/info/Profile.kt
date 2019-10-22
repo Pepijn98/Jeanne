@@ -6,12 +6,12 @@ import info.kurozeropb.jeanne.commands.Command
 import info.kurozeropb.jeanne.core.HttpException
 import info.kurozeropb.jeanne.managers.DatabaseManager
 import info.kurozeropb.jeanne.core.Utils
-import net.dv8tion.jda.core.Permission
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import okhttp3.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import org.litote.kmongo.set
+import org.litote.kmongo.setValue
 import java.io.IOException
 
 class Profile : Command(
@@ -45,7 +45,7 @@ class Profile : Command(
                             return e.reply("Successfully updated your profile background")
                         }
 
-                        DatabaseManager.users.updateOne(User::id eq e.author.id, set(User::background, args[2]))
+                        DatabaseManager.users.updateOne(User::id eq e.author.id, setValue(User::background, args[2]))
                         e.reply("Successfully updated your profile background")
                     }
                     "about" -> {
@@ -56,7 +56,7 @@ class Profile : Command(
                             return e.reply("Successfully updated your about description")
                         }
 
-                        DatabaseManager.users.updateOne(User::id eq e.author.id, set(User::about, message))
+                        DatabaseManager.users.updateOne(User::id eq e.author.id, setValue(User::about, message))
                         e.reply("Successfully updated your about description")
                     }
                 }
