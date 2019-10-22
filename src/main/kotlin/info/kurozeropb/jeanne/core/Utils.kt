@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent
-import net.dv8tion.jda.api.utils.AttachmentOption
 import okhttp3.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -71,11 +70,7 @@ class Utils(private val e: MessageReceivedEvent) {
     fun reply(data: InputStream, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
             if (message != null) {
-                val embed = EmbedBuilder()
-                        .setImage("attachment://$fileName")
-                        .setDescription(message)
-
-                e.channel.sendFile(data, fileName).embed(embed.build()).queue(success)
+                e.channel.sendMessage(message).addFile(data, fileName).queue(success)
             } else {
                 e.channel.sendFile(data, fileName).queue(success)
             }
@@ -85,11 +80,7 @@ class Utils(private val e: MessageReceivedEvent) {
     fun reply(file: File, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
             if (message != null) {
-                val embed = EmbedBuilder()
-                        .setImage("attachment://$fileName")
-                        .setDescription(message)
-
-                e.channel.sendFile(file, fileName).embed(embed.build()).queue(success)
+                e.channel.sendMessage(message).addFile(file, fileName).queue(success)
             } else {
                 e.channel.sendFile(file, fileName).queue(success)
             }
@@ -99,11 +90,7 @@ class Utils(private val e: MessageReceivedEvent) {
     fun reply(bytes: ByteArray, fileName: String, message: String? = null, success: Consumer<Message>? = null) {
         if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
             if (message != null) {
-                val embed = EmbedBuilder()
-                        .setImage("attachment://$fileName")
-                        .setDescription(message)
-
-                e.channel.sendFile(bytes, fileName).embed(embed.build()).queue(success)
+                e.channel.sendMessage(message).addFile(bytes, fileName).queue(success)
             } else {
                 e.channel.sendFile(bytes, fileName).queue(success)
             }
@@ -295,20 +282,17 @@ class Utils(private val e: MessageReceivedEvent) {
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildMemberUpdateNicknameEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
 
-        suspend fun findUser(str: String, e: MessageReceivedEvent? = null): User? {
+        suspend fun findUser(str: String, e: MessageReceivedEvent): User? {
             if (str.isEmpty())
                 return null
-
-            val applicationInfo = Jeanne.shardManager.retrieveApplicationInfo().complete()
-            val jda = e?.jda ?: applicationInfo.jda
 
             val id = userMentionPattern.find(str)?.groups?.get(1)?.value ?: str
             val isValidID = discordIdPattern.matches(id)
             return if (isValidID) {
                 // Just to be sure we do e.jda.getUserById() ourselves too
-                jda.getUserById(id) ?: jda.retrieveUserById(id).await()
+                e.jda.getUserById(id) ?: e.jda.retrieveUserById(id).await()
             } else {
-                jda.users.find { it.name == id }
+                e.jda.users.find { it.name == id }
             }
         }
 
