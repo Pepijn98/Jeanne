@@ -1,5 +1,7 @@
 package info.kurozeropb.jeanne.core
 
+import club.minnced.discord.webhook.WebhookClientBuilder
+import club.minnced.discord.webhook.send.WebhookMessageBuilder
 import com.github.ajalt.mordant.TermColors
 import info.kurozeropb.jeanne.BotLists
 import info.kurozeropb.jeanne.CommandData
@@ -274,16 +276,16 @@ class Utils(private val e: MessageReceivedEvent) {
                     return
                 }
 
-//                val webhookUrl = if (Jeanne.config.env.startsWith("prod")) Jeanne.config.tokens.exception_hook else Jeanne.config.tokens.dev_exception_hook
-//                val webhook = WebhookClientBuilder(webhookUrl).build()
-//                val applicationInfo = Jeanne.shardManager.retrieveApplicationInfo().complete()
-//                val webhookMessage = WebhookMessageBuilder()
-//                        .setAvatarUrl(applicationInfo.jda.selfUser.effectiveAvatarUrl)
-//                        .setUsername(applicationInfo.jda.selfUser.name)
-//                        .setContent(errorMessage)
-//                        .build()
-//                webhook.send(webhookMessage)
-//                webhook.close()
+                val webhookUrl = if (Jeanne.config.env.startsWith("prod")) Jeanne.config.tokens.exception_hook else Jeanne.config.tokens.dev_exception_hook
+                val webhook = WebhookClientBuilder(webhookUrl).build()
+                val applicationInfo = Jeanne.shardManager.retrieveApplicationInfo().complete()
+                val webhookMessage = WebhookMessageBuilder()
+                        .setAvatarUrl(applicationInfo.jda.selfUser.effectiveAvatarUrl)
+                        .setUsername(applicationInfo.jda.selfUser.name)
+                        .setContent(errorMessage)
+                        .build()
+                webhook.send(webhookMessage)
+                webhook.close()
             }
         }
 

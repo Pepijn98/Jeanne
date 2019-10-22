@@ -35,7 +35,7 @@ class User : Command(
                         args.isEmpty() -> e.member
                         else -> return e.reply("No member was found with the username **${args.joinToString(" ")}**")
                     }
-                    ?: return
+                    ?: return e.reply("No member was found with the username **${args.joinToString(" ")}**")
 
             val mutualGuildCount = Jeanne.shardManager.getMutualGuilds(member.user).size
             val joinedDate = member.timeJoined.format(formatter)

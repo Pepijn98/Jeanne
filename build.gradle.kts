@@ -51,6 +51,7 @@ dependencies {
     implementation("com.beust:klaxon:5.0.1")
     implementation("com.github.natanbc:weeb4j:3.5")
     implementation("com.github.ajalt:mordant:1.2.1")
+    implementation("club.minnced:discord-webhooks:0.1.8")
     testCompile("junit:junit:4.12")
 }
 
