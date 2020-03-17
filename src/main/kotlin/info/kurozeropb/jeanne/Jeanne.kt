@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
+import com.github.kurozeropb.api.AzurLane
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.jeanne.core.games
 import net.dv8tion.jda.api.entities.Activity
@@ -36,6 +37,9 @@ object Jeanne {
     lateinit var httpClient: OkHttpClient
     lateinit var defaultHeaders: Map<String, String>
     lateinit var weebApi: Weeb4J
+    lateinit var azurlane: AzurLane
+
+    fun isShardManagerInitialized(): Boolean = ::shardManager.isInitialized
 
     var isReady: Boolean = false
     val uptime: Long
@@ -50,6 +54,8 @@ object Jeanne {
 
             // Initialize the bot config
             config = ConfigManager.read()
+
+            azurlane = AzurLane("JeanneBot/v${config.version} (https://github.com/KurozeroPB/Jeanne)")
 
             // Get the bot token depending on which enviorment version
             val token = when {
@@ -78,7 +84,7 @@ object Jeanne {
             embedColor = Color.decode(config.defaultColor)
 
             // Initialize the database
-            DatabaseManager.initialize(config)
+            try { DatabaseManager.initialize(config) } catch (e: Exception) { println(e) }
             // Register all commands
             Registry().loadCommands()
             // Connect to discord

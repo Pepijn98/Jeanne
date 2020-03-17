@@ -1,6 +1,8 @@
 package info.kurozeropb.jeanne.managers
 
+import com.mongodb.ConnectionString
 import com.mongodb.MongoClient
+import com.mongodb.MongoClientOptions
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import info.kurozeropb.jeanne.CommandData
@@ -31,7 +33,7 @@ class DatabaseManager(guild: Guild) {
         fun initialize(config: Config) {
             println("Connecting to the database... ")
             val milli = measureTimeMillis {
-                client = KMongo.createClient(config.database.host, config.database.port)
+                client = KMongo.createClient(ConnectionString("mongodb://${config.database.user}:${config.database.passwd}@${config.database.host}:${config.database.port}/${config.database.name}?retryWrites=true"))
                 db = client.getDatabase(config.database.name)
                 guilds = db.getCollection<dbGuild>("guilds")
                 users = db.getCollection<dbUser>("users")

@@ -45,7 +45,9 @@ data class Tokens(
 data class Database(
         val host: String,
         val port: Int,
-        val name: String
+        val name: String,
+        val user: String,
+        val passwd: String
 )
 
 data class Proxy(

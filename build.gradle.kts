@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "info.kurozeropb"
-version = "0.7.0"
+version = "0.8.0"
 
 plugins {
     java
@@ -18,7 +18,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70")
     }
 }
 
@@ -33,12 +33,13 @@ repositories {
     mavenCentral()
     jcenter()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.50")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.50")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.70")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.70")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.70")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.2")
     implementation("net.dv8tion:JDA:4.0.0_52") // 3.8.3_462
@@ -52,6 +53,7 @@ dependencies {
     implementation("com.github.natanbc:weeb4j:3.5")
     implementation("com.github.ajalt:mordant:1.2.1")
     implementation("club.minnced:discord-webhooks:0.1.8")
+    implementation("com.github.KurozeroPB:AzurLaneKt:1.1.2")
     testCompile("junit:junit:4.12")
 }
 
