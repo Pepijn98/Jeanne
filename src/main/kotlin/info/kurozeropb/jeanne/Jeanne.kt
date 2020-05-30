@@ -9,10 +9,12 @@ import okhttp3.OkHttpClient
 import java.awt.Color
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
-import com.github.kurozeropb.api.AzurLane
+import com.github.azurlane_api.api.AzurLane
+import com.github.azurlane_api.api.entities.Options
 import com.github.natanbc.weeb4j.Weeb4J
 import info.kurozeropb.jeanne.core.games
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
@@ -55,7 +57,10 @@ object Jeanne {
             // Initialize the bot config
             config = ConfigManager.read()
 
-            azurlane = AzurLane("JeanneBot/v${config.version} (https://github.com/KurozeroPB/Jeanne)")
+            azurlane = AzurLane(Options(
+                    userAgent = "JeanneBot/v${config.version} (https://github.com/KurozeroPB/Jeanne)",
+                    token = config.tokens.azurlane
+            ))
 
             // Get the bot token depending on which enviorment version
             val token = when {
@@ -95,7 +100,7 @@ object Jeanne {
     private fun connect(token: String) {
         Utils.catchAll("Failed to connect to discord", null) {
             // Login to discord
-            shardManager = DefaultShardManagerBuilder()
+            shardManager = DefaultShardManagerBuilder.create(EnumSet.allOf(GatewayIntent::class.java)) // TODO : Only use GatewayIntents we actually need
                     .setShardsTotal(-1)
                     .setToken(token)
                     .setActivity(Activity.watching("https://jeannebot.com"))

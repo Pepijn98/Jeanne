@@ -99,16 +99,23 @@ class EventManager : ListenerAdapter() {
     }
 
     override fun onMessageReceived(e: MessageReceivedEvent) {
+        // Ignore all messages if Jeanne isn't ready yet
         if (Jeanne.isReady.not())
+            return
+
+        // Ignore private messages
+        if (e.isFromType(ChannelType.PRIVATE))
             return
 
         val content = e.message.contentRaw
         val selfId = e.jda.selfUser.id
         val ctx = Utils(e)
 
-        if (!e.guild.isAvailable)
+        // Ignore unavailable guilds
+        if (e.jda.isUnavailable(e.guild.idLong))
             return
 
+        // Ignore webhook/bot messages and messages from jeanne her self
         if (e.isWebhookMessage || e.author.isFake || e.author.isBot || e.author.id == selfId)
             return
 
@@ -116,6 +123,7 @@ class EventManager : ListenerAdapter() {
         if (prefix == "%mention%")
             prefix = e.jda.selfUser.asMention
 
+        // If the message only contains jeanne's mention and nothing else
         if (content.matches("^<@!?$selfId>$".toRegex())) {
             ctx.reply("My prefix for this guild is: **$prefix**")
             return
@@ -123,7 +131,7 @@ class EventManager : ListenerAdapter() {
 
         val isMentionPrefix = content.matches("^<@!?$selfId>\\s.*".toRegex())
         if (isMentionPrefix.not() && content.startsWith(prefix, true).not()) {
-            if (e.isFromType(ChannelType.PRIVATE))
+            if (e.isFromType(ChannelType.PRIVATE)) // Redundant since we already ignore all DMs but just in case something dumb happens ¯\_(ツ)_/¯
                 return
 
             val authorData = DatabaseManager.usersData[e.author.id]
@@ -136,10 +144,7 @@ class EventManager : ListenerAdapter() {
                 if (currLevel > level) {
                     DatabaseManager.usersData[e.author.id]!!["level"] = currLevel
                     DatabaseManager.usersData[e.author.id]!!["points"] = points
-                    DatabaseManager.users.updateOne(
-                            User::id eq e.author.id,
-                            set(SetTo(User::level, currLevel), SetTo(User::points, points))
-                    )
+                    DatabaseManager.users.updateOne(User::id eq e.author.id, set(SetTo(User::level, currLevel), SetTo(User::points, points)))
 
                     val dbManager = DatabaseManager(e.guild)
                     val guild = dbManager.getGuildData()
@@ -278,7 +283,7 @@ class EventManager : ListenerAdapter() {
         }
     }
 
-    override fun onGuildMemberLeave(e: GuildMemberLeaveEvent) {
+    override fun onGuildMemberRemove(e: GuildMemberRemoveEvent) {
         val db = DatabaseManager(e.guild)
         val guild = db.getGuildData() ?: return
 

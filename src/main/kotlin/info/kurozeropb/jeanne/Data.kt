@@ -39,6 +39,7 @@ data class Tokens(
         val wolke: String,
         val imdb: String,
         val kurozero: String,
+        val azurlane: String,
         val botlists: HashMap<String, String>
 )
 

@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.events.guild.GuildBanEvent
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
-import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent
 import okhttp3.*
 import org.litote.kmongo.eq
@@ -63,6 +63,12 @@ class Utils(private val e: MessageReceivedEvent) {
             val embed = builder
                     .setColor(embedColor())
                     .build()
+            e.channel.sendMessage(embed).queue(success)
+        }
+    }
+
+    fun reply(embed: MessageEmbed, success: Consumer<Message>? = null) {
+        if (!e.isFromType(ChannelType.TEXT) || e.textChannel.canTalk()) {
             e.channel.sendMessage(embed).queue(success)
         }
     }
@@ -279,7 +285,7 @@ class Utils(private val e: MessageReceivedEvent) {
         }
 
         fun embedColor(e: GuildMemberJoinEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
-        fun embedColor(e: GuildMemberLeaveEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
+        fun embedColor(e: GuildMemberRemoveEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildBanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildUnbanEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor
         fun embedColor(e: GuildMemberUpdateNicknameEvent): Color = e.guild.selfMember.color ?: Jeanne.embedColor

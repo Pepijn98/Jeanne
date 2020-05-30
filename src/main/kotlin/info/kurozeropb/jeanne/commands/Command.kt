@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.awt.Color
 import java.io.File
@@ -71,6 +72,9 @@ abstract class Command(
 
     fun MessageReceivedEvent.reply(builder: EmbedBuilder, success: Consumer<Message>? = null)
             = Utils(this).reply(builder, success)
+
+    fun MessageReceivedEvent.reply(embed: MessageEmbed, success: Consumer<Message>? = null)
+            = Utils(this).reply(embed, success)
 
     fun MessageReceivedEvent.reply(text: String, success: Consumer<Message>? = null)
             = Utils(this).reply(text, success)
