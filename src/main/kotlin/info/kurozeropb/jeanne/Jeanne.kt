@@ -100,10 +100,12 @@ object Jeanne {
     private fun connect(token: String) {
         Utils.catchAll("Failed to connect to discord", null) {
             // Login to discord
-            shardManager = DefaultShardManagerBuilder.create(EnumSet.allOf(GatewayIntent::class.java)) // TODO : Only use GatewayIntents we actually need
+            // TODO : Only use GatewayIntents we actually need
+            // shardManager = DefaultShardManagerBuilder.create(EnumSet.allOf(GatewayIntent::class.java))
+            shardManager = DefaultShardManagerBuilder.createDefault(token)
+                    // .setToken(token)
                     .setShardsTotal(-1)
-                    .setToken(token)
-                    .setActivity(Activity.watching("https://jeannebot.com"))
+                    .setActivity(Activity.watching("you"))
                     .setBulkDeleteSplittingEnabled(false)
                     .addEventListeners(EventManager())
                     .build()
@@ -128,10 +130,10 @@ enum class BotLists(val url: String) {
     BOTLIST_SPACE("https://botlist.space/api/bots/237578660708745216"),
     BOTSFORDISCORD("https://botsfordiscord.com/api/bot/237578660708745216"),
     BOTS_ONDISCORD("https://bots.ondiscord.xyz/bot-api/bots/237578660708745216/guilds"),
-    DISCORDBOATS("https://discordboats.club/api/public/bot/stats"),
-    DISCORDBOTS_ORG("https://discordbots.org/api/bots/237578660708745216/stats"),
+    DISCORDBOATS("https://discord.boats/api/public/bot/stats"),
+    DISCORDBOTS_ORG("https://top.gg/api/bots/237578660708745216/stats"),
     DISCORDBOT_WORLD("https://discordbot.world/api/bot/237578660708745216/stats"),
-    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats")
+//    DISCORD_BOTS_GG("https://discord.bots.gg/api/v1/bots/237578660708745216/stats")
 }
 
 enum class ExitStatus(val code: Int) {

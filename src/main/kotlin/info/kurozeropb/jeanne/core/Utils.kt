@@ -128,7 +128,7 @@ class Utils(private val e: MessageReceivedEvent) {
                         BotLists.DISCORDBOATS.name -> sendGuildCount(BotLists.DISCORDBOATS, guildCount)
                         BotLists.DISCORDBOTS_ORG.name -> sendGuildCount(BotLists.DISCORDBOTS_ORG, guildCount, shardCount)
                         BotLists.DISCORDBOT_WORLD.name -> sendGuildCount(BotLists.DISCORDBOT_WORLD, guildCount, shardCount)
-                        BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
+//                        BotLists.DISCORD_BOTS_GG.name -> sendGuildCount(BotLists.DISCORD_BOTS_GG, guildCount, shardCount)
                     }
                 }
             }
@@ -143,7 +143,7 @@ class Utils(private val e: MessageReceivedEvent) {
             val json = when (list) {
                 BotLists.BOTS_ONDISCORD -> "{\"guildCount\": $guildCount}"
                 BotLists.DISCORDBOT_WORLD -> "{\"guild_count\": $guildCount, \"shard_count\": $shardCount}"
-                BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
+//                BotLists.DISCORD_BOTS_GG -> "{\"guildCount\": $guildCount, \"shardCount\": $shardCount}"
                 else -> if (shardCount != null) "{\"server_count\": $guildCount, \"shard_count\": $shardCount}" else "{\"server_count\": $guildCount}"
             }
 
