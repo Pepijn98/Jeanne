@@ -60,7 +60,7 @@ object Jeanne {
 
             azurlane = AzurLane(
                 Options(
-                    userAgent = "JeanneBot/v${config.version} (https://github.com/KurozeroPB/Jeanne)",
+                    userAgent = "JeanneBot/v${config.version} (github.com/Pepijn98/Jeanne)",
                     token = config.tokens.azurlane
                 )
             )
